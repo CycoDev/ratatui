@@ -32,12 +32,15 @@ namespace CycoAI.CycoTui.Core.Widgets
 
         /// <summary>
         /// Determines whether this widget can be rendered in the specified area.
-        /// By default, checks if the area meets the minimum size requirements.
+        /// By default, checks if the area is not empty and meets the minimum size requirements.
         /// </summary>
         /// <param name="area">The area to check.</param>
         /// <returns>true if the widget can be rendered in the area; otherwise, false.</returns>
         public virtual bool CanRender(Rect area)
         {
+            if (area.IsEmpty)
+                return false;
+
             var (minWidth, minHeight) = GetMinimumSize();
             return area.Width >= minWidth && area.Height >= minHeight;
         }
@@ -74,12 +77,15 @@ namespace CycoAI.CycoTui.Core.Widgets
 
         /// <summary>
         /// Determines whether this widget can be rendered in the specified area.
-        /// By default, checks if the area meets the minimum size requirements.
+        /// By default, checks if the area is not empty and meets the minimum size requirements.
         /// </summary>
         /// <param name="area">The area to check.</param>
         /// <returns>true if the widget can be rendered in the area; otherwise, false.</returns>
         public virtual bool CanRender(Rect area)
         {
+            if (area.IsEmpty)
+                return false;
+
             var (minWidth, minHeight) = GetMinimumSize();
             return area.Width >= minWidth && area.Height >= minHeight;
         }
