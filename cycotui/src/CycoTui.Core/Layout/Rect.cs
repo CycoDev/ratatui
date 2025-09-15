@@ -150,6 +150,13 @@ namespace CycoAI.CycoTui.Core.Layout
             return new Rect(newX, newY, newWidth, newHeight);
         }
 
+        /// <summary>
+        /// Returns a new rectangle with the specified margin applied.
+        /// </summary>
+        /// <param name="margin">The margin to apply.</param>
+        /// <returns>A new rectangle with margin applied.</returns>
+        public Rect WithMargin(Margin margin) => WithMargin(margin.Left, margin.Top, margin.Right, margin.Bottom);
+
         /// <inheritdoc />
         public bool Equals(Rect other) => X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
 
