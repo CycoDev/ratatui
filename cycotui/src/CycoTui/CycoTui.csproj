@@ -2,12 +2,16 @@
 
   <PropertyGroup>
     <TargetFrameworks>net9.0;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <RootNamespace>CycoAI.CycoTui</RootNamespace>
     <AssemblyName>CycoAI.CycoTui</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Enable ImplicitUsings only for .NET 9.0 -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup>
