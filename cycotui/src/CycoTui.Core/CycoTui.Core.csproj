@@ -1,9 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <RootNamespace>CycoAI.CycoTui.Core</RootNamespace>
+    <AssemblyName>CycoAI.CycoTui.Core</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>CycoAI.CycoTui.Core</PackageId>
+    <PackageVersion>0.1.0</PackageVersion>
+    <Title>CycoTui Core</Title>
+    <Description>Core types and interfaces for CycoTui terminal UI framework</Description>
+    <Authors>CycoAI</Authors>
+    <PackageTags>terminal;tui;console;ui</PackageTags>
+    <RepositoryUrl>https://github.com/cycoai/cycotui</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>

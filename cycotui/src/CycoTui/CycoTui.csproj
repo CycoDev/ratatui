@@ -1,9 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <RootNamespace>CycoAI.CycoTui</RootNamespace>
+    <AssemblyName>CycoAI.CycoTui</AssemblyName>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>CycoAI.CycoTui</PackageId>
+    <PackageVersion>0.1.0</PackageVersion>
+    <Title>CycoTui</Title>
+    <Description>Terminal UI framework for .NET - A C# port of Ratatui</Description>
+    <Authors>CycoAI</Authors>
+    <PackageTags>terminal;tui;console;ui;ratatui</PackageTags>
+    <RepositoryUrl>https://github.com/cycoai/cycotui</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../CycoTui.Core/CycoTui.Core.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <RootNamespace>CycoAI.CycoTui.Tests</RootNamespace>
+    <AssemblyName>CycoAI.CycoTui.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +18,11 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/CycoTui.Core/CycoTui.Core.csproj" />
+    <ProjectReference Include="../../src/CycoTui/CycoTui.csproj" />
   </ItemGroup>
 
 </Project>
