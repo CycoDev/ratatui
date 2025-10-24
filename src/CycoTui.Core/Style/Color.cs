@@ -61,7 +61,7 @@ public readonly struct Color : IEquatable<Color>
     };
 }
 
-internal enum ColorKind : byte
+public enum ColorKind : byte
 {
     Reset = 0,
     Ansi = 1,

@@ -36,6 +36,7 @@ internal sealed class WindowsBackendStub : ITerminalBackend
     public void Clear(ClearType type = ClearType.All) { }
     public void Dispose() { }
     public void Draw(IEnumerable<CellUpdate> updates) { }
+    public void WriteRaw(string sequence) { /* no-op for stub */ }
     public void Flush() { }
     public Position GetCursorPosition() => new(0, 0);
     public Size GetSize() => new(120, 40);
