@@ -1,7 +1,7 @@
 namespace CycoTui.Core.Layout;
 
 /// <summary>
-/// Kind of layout constraint applied to a segment.
+/// Enumerates supported layout constraint kinds used in distributing space.
 /// </summary>
 public enum ConstraintKind
 {

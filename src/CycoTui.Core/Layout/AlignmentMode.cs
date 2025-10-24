@@ -1,7 +1,7 @@
 namespace CycoTui.Core.Layout;
 
 /// <summary>
-/// Alignment/distribution mode for remaining space among segments.
+/// Alignment/distribution mode controlling placement and spacing of segments within available free space.
 /// </summary>
 public enum AlignmentMode
 {

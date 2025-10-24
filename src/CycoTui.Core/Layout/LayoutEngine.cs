@@ -5,11 +5,13 @@ using CycoTui.Core.Logging;
 namespace CycoTui.Core.Layout;
 
 /// <summary>
-/// Distributes space among constraints producing child rectangles.
-/// Precedence order: Length -> Min -> Percentage -> Ratio -> Fill -> Max enforcement.
-/// Handles alignment and margin/padding.
-/// Overflow policy: proportional shrink of Min then Length if mandatory space exceeds available.
+/// Distributes space among constraints, producing child rectangles horizontally or vertically.
 /// </summary>
+/// <remarks>
+/// Precedence order: Length -> Min -> Percentage -> Ratio -> Fill -> Max enforcement.
+/// Overflow policy: proportional shrink of Min first, then Length if needed.
+/// Alignment applied after sizing.
+/// </remarks>
 public sealed class LayoutEngine
 {
     private readonly LoggingContext _logging;

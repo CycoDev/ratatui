@@ -3,8 +3,12 @@ using System;
 namespace CycoTui.Core.Layout;
 
 /// <summary>
-/// Represents a single layout constraint for distributing space.
+/// Represents a layout constraint influencing size calculation for a segment.
 /// </summary>
+/// <remarks>
+/// Precedence order in distribution: Length -> Min -> Percentage -> Ratio -> Fill -> Max enforcement.
+/// Ratio uses Value/Denominator as weight.
+/// </remarks>
 public readonly struct Constraint
 {
     public ConstraintKind Kind { get; }
