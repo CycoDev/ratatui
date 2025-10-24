@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "12d+jGGALrU=",
+  "success": true,
+  "projectFilePath": "/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/DocGenProbe.csproj",
+  "expectedPackageFiles": [
+    "/Users/phs/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/Users/phs/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/Users/phs/.nuget/packages/microsoft.netcore.app.ref/8.0.17/microsoft.netcore.app.ref.8.0.17.nupkg.sha512",
+    "/Users/phs/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.17/microsoft.aspnetcore.app.ref.8.0.17.nupkg.sha512"
+  ],
+  "logs": []
+}

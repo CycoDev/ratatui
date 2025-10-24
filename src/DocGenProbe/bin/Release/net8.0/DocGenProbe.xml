@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DocGenProbe</name>
+    </assembly>
+    <members>
+        <member name="T:DocGenProbe.Probe">
+            <summary>
+            Simple probe type used to verify XML doc generation.
+            </summary>
+        </member>
+        <member name="M:DocGenProbe.Probe.Hello(System.String)">
+            <summary>
+            Returns a greeting.
+            </summary>
+        </member>
+    </members>
+</doc>

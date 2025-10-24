@@ -1,0 +1,14 @@
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/bin/Release/net8.0/DocGenProbe.xml
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/bin/Release/net8.0/DocGenProbe.deps.json
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/bin/Release/net8.0/DocGenProbe.dll
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/bin/Release/net8.0/DocGenProbe.pdb
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.csproj.AssemblyReference.cache
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.GeneratedMSBuildEditorConfig.editorconfig
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.AssemblyInfoInputs.cache
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.AssemblyInfo.cs
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.csproj.CoreCompileInputs.cache
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.sourcelink.json
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.dll
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/refint/DocGenProbe.dll
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/DocGenProbe.pdb
+/Users/phs/cycoai/github/cycodev/ratatui/src/DocGenProbe/obj/Release/net8.0/ref/DocGenProbe.dll
