@@ -1,5 +1,10 @@
 using System.Text;
 
+
+namespace CycoTui.Core.Style;
+
+using System.Text;
+
 namespace CycoTui.Core.Style;
 
 /// <summary>
