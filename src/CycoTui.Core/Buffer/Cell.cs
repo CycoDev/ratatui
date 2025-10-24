@@ -4,7 +4,9 @@ using CycoTui.Core.Style;
 namespace CycoTui.Core.Buffer;
 
 /// <summary>
-/// Represents a single buffer cell. Phase-2 expanded: holds a grapheme (Symbol), cached width, style, and a Skip flag for continuation cells of multi-width graphemes.
+/// <summary>
+/// A single cell within a Buffer. Stores a grapheme cluster, cached column width, style, and Skip flag indicating continuation of a multi-width grapheme.
+/// </summary>
 /// </summary>
 public readonly struct Cell : IEquatable<Cell>
 {

@@ -5,7 +5,7 @@ using CycoTui.Core.Terminal;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Scrollbar visualization based on content length vs viewport size and offset.
+/// Scrollbar widget visualizing scroll state given content size, viewport size, and current offset.
 /// </summary>
 public sealed class ScrollbarWidget : IWidget
 {

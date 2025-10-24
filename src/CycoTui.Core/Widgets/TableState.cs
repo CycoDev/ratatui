@@ -1,7 +1,7 @@
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// State for Table widget: selected row + vertical offset.
+/// State for TableWidget tracking selected row and vertical scroll offset.
 /// </summary>
 public sealed class TableState
 {

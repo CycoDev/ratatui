@@ -9,13 +9,10 @@ using CycoTui.Core.Style;
 namespace CycoTui.Core.Terminal;
 
 /// <summary>
-/// Manages double-buffered rendering using an ITerminalBackend.
-/// Responsibilities:
-/// - Maintain previous and current buffers for diffing
-/// - Invoke user render callback to populate frame
-/// - Diff and emit changed cells + style transitions
-/// - Emit style reset only when styles changed
-/// NOTE: Not thread-safe; single UI thread confinement required.
+/// Provides the high-level drawing API for CycoTui.
+/// Manages double-buffered rendering (previous/current) against an ITerminalBackend, performs diffing
+/// and optimized style transitions, and emits a style reset only when styles changed.
+/// Thread confinement: not thread-safe; callers must serialize Draw invocations.
 /// </summary>
 public sealed class Terminal : IDisposable
 {

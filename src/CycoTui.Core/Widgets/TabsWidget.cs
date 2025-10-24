@@ -8,7 +8,7 @@ using CycoTui.Core.Text;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Tabs widget renders a set of tab labels with a selected index.
+/// Tabs widget rendering a horizontal set of labels with alignment and selected tab styling.
 /// </summary>
 public sealed class TabsWidget : IStatefulWidget<int>
 {

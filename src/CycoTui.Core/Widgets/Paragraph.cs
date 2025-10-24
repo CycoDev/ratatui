@@ -8,7 +8,7 @@ using CycoTui.Core.Text;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Renders multi-line text with wrapping and alignment.
+/// Multi-line text widget supporting grapheme-aware wrapping, horizontal alignment, and max line limiting.
 /// </summary>
 public sealed class Paragraph : IWidget
 {

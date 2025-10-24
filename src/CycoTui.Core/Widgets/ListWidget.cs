@@ -8,7 +8,7 @@ using CycoTui.Core.Text;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Simple vertical list widget with selection highlighting.
+/// Vertical list widget supporting selection highlighting, optional item wrapping, and scrolling via ListState.
 /// </summary>
 public sealed class ListWidget : IStatefulWidget<ListState>
 {

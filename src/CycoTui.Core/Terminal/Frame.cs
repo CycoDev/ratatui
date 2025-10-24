@@ -4,7 +4,7 @@ using CycoTui.Core.Style;
 namespace CycoTui.Core.Terminal;
 
 /// <summary>
-/// Represents a rendering frame wrapper allowing widgets/content to write into the buffer.
+/// Represents a rendering frame for a single Draw cycle, exposing write helpers into the underlying buffer.
 /// </summary>
 public sealed class Frame
 {

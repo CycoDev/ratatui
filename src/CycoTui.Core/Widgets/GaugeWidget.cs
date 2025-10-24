@@ -5,7 +5,7 @@ using CycoTui.Core.Terminal;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Gauge / progress bar widget (horizontal) showing ratio completion.
+/// Horizontal progress bar (gauge) widget showing completion ratio with configurable characters and styles.
 /// </summary>
 public sealed class GaugeWidget : IWidget
 {

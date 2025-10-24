@@ -5,15 +5,12 @@ using CycoTui.Core.Style;
 namespace CycoTui.Core.Buffer;
 
 /// <summary>
-/// Minimal buffer model: flat array of Cells within a defined Area (Origin + Size).
-/// Phase-1: no multi-width handling, no diff optimization; will evolve per BUFFER-MODEL-001 & BUFFER-DIFF tasks.
+/// Represents a 2D terminal drawing surface for a frame. Stores Cells in a flat array indexed by X/Y.
+/// Supports grapheme-aware insertion (SetString) including multi-width (emoji/CJK) handling via skip flags.
 /// </summary>
 /// <remarks>
-/// Future enhancements:
-/// - Rect abstraction replacing Origin/Size pairing.
-/// - Multi-grapheme cluster and width caching.
-/// - Skip flags for diff optimization.
-/// - Region/segment based diff output.
+/// Buffer is reused across frames; Clear() resets all cells to Empty without reallocating.
+/// Skip cells mark continuation parts of wide graphemes to avoid redundant emission on diff.
 /// </remarks>
 public sealed class Buffer
 {

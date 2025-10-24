@@ -4,9 +4,10 @@ using System.Globalization;
 namespace CycoTui.Core.Style;
 
 /// <summary>
-/// Represents a terminal color (ANSI named, indexed 0-255, or 24-bit RGB).
-/// Use factory methods (AnsiIndex, Indexed, Rgb) to create instances. Reset represents default terminal color.
-/// Equality considers kind and component values.
+/// <summary>
+/// Terminal color abstraction covering ANSI named (basic indices), 256-color indexed, and 24-bit RGB.
+/// Use factory methods (AnsiIndex, Indexed, Rgb). Reset indicates terminal default color.
+/// </summary>
 /// </summary>
 public readonly struct Color : IEquatable<Color>
 {

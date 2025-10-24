@@ -5,7 +5,7 @@ using CycoTui.Core.Terminal;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Block provides an optional border, title, and inner content area calculation.
+/// Renders a bordered container with optional title. Serves as a foundational container widget.
 /// </summary>
 public sealed class Block : IWidget
 {

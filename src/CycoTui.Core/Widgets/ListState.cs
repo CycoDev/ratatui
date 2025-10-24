@@ -1,7 +1,7 @@
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// State for a List widget: selected index tracking.
+/// State for ListWidget including selected index and vertical scroll offset.
 /// </summary>
 public sealed class ListState
 {
