@@ -118,6 +118,22 @@ internal static class Program
             Console.WriteLine("README is up to date.");
             return 0;
         }
+    private static Dictionary<string,string?> LoadXmlDocs(string xmlPath)
+    {
+        if (!File.Exists(xmlPath)) return new Dictionary<string,string?>();
+        var xdoc = XDocument.Load(xmlPath);
+        return xdoc.Root?.Element("members")?.Elements("member")
+            .Where(m => m.Attribute("name") != null)
+            .ToDictionary(m => m.Attribute("name")!.Value, m => (string?)m.Element("summary")?.Value.Trim())
+            ?? new Dictionary<string,string?>();
+    }
+
+    private static bool HasNonEmpty(Dictionary<string,string?> docs, string key)
+        => docs.ContainsKey(key) && !string.IsNullOrWhiteSpace(docs[key]);
+
+    private static string? Lookup(Dictionary<string,string?> docs, string key)
+        => docs.TryGetValue(key, out var v) ? v : null;
+
 
         Console.Error.WriteLine($"Unknown command: {command}");
         return 6;
