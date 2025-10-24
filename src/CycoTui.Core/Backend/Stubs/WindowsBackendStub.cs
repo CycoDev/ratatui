@@ -14,9 +14,11 @@ internal sealed class WindowsBackendStub : ITerminalBackend
         _logger = logger;
         Capabilities = DetectCapabilities();
         _logger?.LogDebug("[WindowsBackendStub] Capability snapshot: {level}, underline={underline}, mouse={mouse}, scrollRegions={scroll}", Capabilities.ColorLevel, Capabilities.SupportsUnderlineColor, Capabilities.SupportsMouse, Capabilities.SupportsScrollingRegions);
+        _logger?.LogDebug("[WindowsBackendStub] Initialized capabilities: {caps}", Capabilities);
+    }
+
     private BackendCapabilities DetectCapabilities()
     {
-        // Basic heuristic placeholder: check for WT_SESSION (Windows Terminal) and truecolor env hints.
         var hasWindowsTerminal = Environment.GetEnvironmentVariable("WT_SESSION") != null;
         var colorterm = Environment.GetEnvironmentVariable("COLORTERM")?.ToLowerInvariant();
         var trueColor = colorterm is "truecolor" or "24bit";
@@ -26,11 +28,8 @@ internal sealed class WindowsBackendStub : ITerminalBackend
             supportsMouse: true,
             supportsScrollingRegions: false,
             supportsTrueColor: trueColor,
-            supportsUnicodeWidthReliably: trueColor // placeholder assumption
+            supportsUnicodeWidthReliably: trueColor
         );
-    }
-
-        _logger?.LogDebug("[WindowsBackendStub] Initialized capabilities: {caps}", Capabilities);
     }
 
     public void AppendLines(int count = 1) { /* no-op stub */ }

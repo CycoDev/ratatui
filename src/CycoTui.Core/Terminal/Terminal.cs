@@ -81,7 +81,7 @@ public sealed class Terminal : IDisposable
         logger.LogDebug("[Terminal] Changed segments: {count}", segments.Count);
 
         // Style tracking
-        var styleState = new StyleState();
+        var styleState = new StyleState(_backend.Capabilities);
         var cellUpdates = new List<CellUpdate>();
 
         foreach (var seg in segments)

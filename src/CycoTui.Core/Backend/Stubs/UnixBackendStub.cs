@@ -14,6 +14,9 @@ internal sealed class UnixBackendStub : ITerminalBackend
         _logger = logger;
         Capabilities = DetectCapabilities();
         _logger?.LogDebug("[UnixBackendStub] Capability snapshot: {level}, underline={underline}, mouse={mouse}, scrollRegions={scroll}", Capabilities.ColorLevel, Capabilities.SupportsUnderlineColor, Capabilities.SupportsMouse, Capabilities.SupportsScrollingRegions);
+        _logger?.LogDebug("[UnixBackendStub] Initialized capabilities: {caps}", Capabilities);
+    }
+
     private BackendCapabilities DetectCapabilities()
     {
         var colorterm = Environment.GetEnvironmentVariable("COLORTERM")?.ToLowerInvariant();
@@ -24,14 +27,11 @@ internal sealed class UnixBackendStub : ITerminalBackend
         return new BackendCapabilities(
             level,
             supportsUnderlineColor: false,
-            supportsMouse: true, // optimistic placeholder
-            supportsScrollingRegions: true, // common in modern terminals
+            supportsMouse: true,
+            supportsScrollingRegions: true,
             supportsTrueColor: trueColor,
-            supportsUnicodeWidthReliably: level == ColorLevel.TrueColor // placeholder heuristic
+            supportsUnicodeWidthReliably: level == ColorLevel.TrueColor
         );
-    }
-
-        _logger?.LogDebug("[UnixBackendStub] Initialized capabilities: {caps}", Capabilities);
     }
 
     public void AppendLines(int count = 1) { }

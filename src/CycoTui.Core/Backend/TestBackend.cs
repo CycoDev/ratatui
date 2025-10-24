@@ -30,11 +30,11 @@ public sealed class TestBackend : ITerminalBackend
         }
         _frames.Add(list);
     }
+    public IReadOnlyList<IReadOnlyList<CellUpdate>> Frames => _frames;
+
     public void WriteRaw(string sequence)
     {
         if (string.IsNullOrEmpty(sequence)) return;
-    public IReadOnlyList<IReadOnlyList<CellUpdate>> Frames => _frames;
-
         _rawSequences.Add(sequence);
         if (sequence.Contains("\u001b[0m")) MarkReset();
     }
