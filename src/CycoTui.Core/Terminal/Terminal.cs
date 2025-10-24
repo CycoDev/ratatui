@@ -126,17 +126,11 @@ public sealed class Terminal : IDisposable
 
     private void SwapBuffers()
     {
-        // Reuse current buffer as previous without reallocation, allocate a fresh current and reuse previous storage next frame.
+        // Previous becomes old current.
+        var tmp = _previous;
         _previous = _current;
-        var size = _backend.GetSize();
-        // Reuse existing previous buffer cells by clearing rather than allocating a new one.
-        _current = ReuseOrAllocate(size);
-    }
-
-    private Buffer ReuseOrAllocate(Size size)
-    {
-        // If dimensions changed we allocated fresh earlier in EnsureSize.
-        return Buffer.Empty(size); // TODO: Implement in-place clear & reuse pool
+        _current = tmp;
+        _current.Clear(); // in-place reuse
     }
 
     /// <summary>Dispose backend and release resources. Safe to call multiple times.</summary>

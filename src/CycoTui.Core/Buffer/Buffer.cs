@@ -39,6 +39,12 @@ public sealed class Buffer
     /// </summary>
     public static Buffer Empty(Size size) => new(new Position(0, 0), size);
 
+    /// <summary>Clear all cells to <see cref="Cell.Empty"/> without reallocating.</summary>
+    public void Clear()
+    {
+        for (int i = 0; i < _cells.Length; i++) _cells[i] = Cell.Empty;
+    }
+
     /// <summary>
     /// Returns a 0-based flattened index for coordinates. Throws with descriptive details if out of bounds.
     /// </summary>
