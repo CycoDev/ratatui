@@ -19,12 +19,13 @@ date: 2023-11-28
 ## Tasks
 - [ ] WIDGET-BASE-001: Create widget interfaces and base classes
 - [ ] WIDGET-STATEFUL-INTERFACE-001: Implement stateful widget interface
-- [ ] WIDGET-PARAGRAPH-001: Implement paragraph widget
-- [ ] WIDGET-BLOCK-001: Implement block/border widget
+- [ ] WIDGET-PARAGRAPH-001: Implement paragraph widget (wrapping + trimming + horizontal offset)
+- [ ] WIDGET-BLOCK-001: Implement block/border widget (uses MergeStrategy Replace & Preserve)
 - [ ] WIDGET-SCROLLBAR-001: Implement scrollbar widget
 - [ ] WIDGET-LOGO-001: Implement logo widget (simple text-based widget pattern)
 - [ ] WIDGET-STATE-001: Implement widget state management
 - [ ] WIDGET-COMPOSITION-001: Create widget composition system
+- [ ] TEXT-HSCROLL-TRUNCATOR-001: Implement horizontal truncation/scrolling component
 - [ ] WIDGET-DEMO-001: Create widget demonstration app
 
 ## Technical Focus Areas

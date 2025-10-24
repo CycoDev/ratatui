@@ -1,0 +1,62 @@
+name: .NET Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build-test-dotnet:
+    name: Build & Test (CycoTui .NET)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore CycoTui.sln
+
+      - name: Build (Release)
+        run: dotnet build CycoTui.sln -c Release --no-restore
+
+      - name: Test (Release)
+        run: dotnet test CycoTui.sln -c Release --no-build --verbosity minimal
+
+      - name: Run verification script (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: bash build/verify.sh
+
+      - name: Run verification script (Windows)
+        if: runner.os == 'Windows'
+        run: powershell -ExecutionPolicy Bypass -File build/verify.ps1
+
+  readme-check-dotnet:
+    name: README Validation (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Placeholder README check
+        run: |
+          echo "README validation placeholder (BUILD-README-VALIDATION-001)" \
+            && exit 0

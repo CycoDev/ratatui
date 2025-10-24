@@ -20,7 +20,11 @@ date: 2023-11-28
 - [ ] SETUP-BUILD-SYSTEM-001: Configure build system and NuGet packaging
 - [ ] BUILD-VERIFICATION-001: Implement build verification and feature testing system
 - [ ] SETUP-TESTING-001: Establish testing framework
+- [ ] SETUP-LOGGING-INTEGRATION-001: Introduce ILogger abstractions and default no-op logger
+- [ ] SETUP-FEATURE-FLAGS-001: Implement compile-time and runtime feature flag infrastructure
+- [ ] BUILD-README-VALIDATION-001: Add CI validation for auto-generated README freshness
 - [ ] CORE-BACKEND-INTERFACE-001: Define terminal backend interface
+- [ ] CORE-BACKEND-CAPABILITIES-001: Backend capability detection (colors, underline color, scrolling regions)
 - [ ] CORE-WINDOWS-BACKEND-001: Implement Windows terminal backend
 - [ ] CORE-UNIX-BACKEND-001: Implement Unix terminal backend
 

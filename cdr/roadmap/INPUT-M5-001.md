@@ -21,7 +21,8 @@ date: 2023-11-28
 - [ ] INPUT-KEYBOARD-001: Implement keyboard input handling
 - [ ] INPUT-MOUSE-001: Implement mouse input handling
 - [ ] INPUT-RESIZE-001: Implement terminal resize handling
-- [ ] INPUT-APP-001: Create application framework with event loop
+- [ ] INPUT-APP-001: Create application framework with blocking event loop
+- [ ] INPUT-ASYNC-PIPELINE-PLANNING-001: Design async event streaming upgrade (IAsyncEnumerable/channel)
 - [ ] INPUT-DEMO-001: Create interactive demonstration app
 
 ## Technical Focus Areas

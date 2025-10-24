@@ -19,9 +19,16 @@ date: 2023-11-28
 ## Tasks
 - [ ] BUFFER-MODEL-001: Implement buffer data structure
 - [ ] BUFFER-CELL-001: Implement cell model
-- [ ] BUFFER-DIFF-001: Develop buffer diffing algorithm
-- [ ] STYLE-BASIC-001: Implement basic styling system
+- [ ] BUFFER-DIFF-001: Develop buffer diffing algorithm (cell-level)
+- [ ] BUFFER-DIFF-SEGMENTS-001: Implement contiguous segment aggregation for diff output
+- [ ] STYLE-BASIC-001: Implement basic styling system (modifier diff normalization, underline color fallback)
 - [ ] BUFFER-RENDER-001: Create rendering pipeline
+- [ ] CORE-TEST-BACKEND-001: In-memory backend with configurable scrollback
+- [ ] TERMINAL-STYLE-RESET-001: Ensure frame-end style reset emission
+- [ ] TEXT-GRAPHEME-SEGMENTATION-001: Implement grapheme iteration
+- [ ] TEXT-GRAPHEME-WIDTH-INIT: Internal Unicode width provider
+- [ ] TEXT-AMBIGUOUS-WIDTH-POLICY-001: WidthMode (Standard vs EastAsian)
+- [ ] TEXT-MASKED-001: Basic masked text type
 
 ## Technical Focus Areas
 - Efficient buffer management

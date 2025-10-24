@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+
+namespace CycoTui.Core.Backend.Stubs;
+
+internal sealed class WindowsBackendStub : ITerminalBackend
+{
+    private readonly ILogger? _logger;
+    public BackendCapabilities Capabilities { get; }
+
+    public WindowsBackendStub(ILogger? logger)
+    {
+        _logger = logger;
+        Capabilities = DetectCapabilities();
+        _logger?.LogDebug("[WindowsBackendStub] Capability snapshot: {level}, underline={underline}, mouse={mouse}, scrollRegions={scroll}", Capabilities.ColorLevel, Capabilities.SupportsUnderlineColor, Capabilities.SupportsMouse, Capabilities.SupportsScrollingRegions);
+    private BackendCapabilities DetectCapabilities()
+    {
+        // Basic heuristic placeholder: check for WT_SESSION (Windows Terminal) and truecolor env hints.
+        var hasWindowsTerminal = Environment.GetEnvironmentVariable("WT_SESSION") != null;
+        var colorterm = Environment.GetEnvironmentVariable("COLORTERM")?.ToLowerInvariant();
+        var trueColor = colorterm is "truecolor" or "24bit";
+        return new BackendCapabilities(
+            trueColor ? ColorLevel.TrueColor : ColorLevel.Ansi16,
+            supportsUnderlineColor: false,
+            supportsMouse: true,
+            supportsScrollingRegions: false,
+            supportsTrueColor: trueColor,
+            supportsUnicodeWidthReliably: trueColor // placeholder assumption
+        );
+    }
+
+        _logger?.LogDebug("[WindowsBackendStub] Initialized capabilities: {caps}", Capabilities);
+    }
+
+    public void AppendLines(int count = 1) { /* no-op stub */ }
+    public void Clear(ClearType type = ClearType.All) { }
+    public void Dispose() { }
+    public void Draw(IEnumerable<CellUpdate> updates) { }
+    public void Flush() { }
+    public Position GetCursorPosition() => new(0, 0);
+    public Size GetSize() => new(120, 40);
+    public WindowSize GetWindowSize() => new(new Size(120, 40), Size.Empty);
+    public void HideCursor() { }
+    public void ScrollRegionDown(Range region, int lineCount) { }
+    public void ScrollRegionUp(Range region, int lineCount) { }
+    public void SetCursorPosition(Position position) { }
+    public void ShowCursor() { }
+}

@@ -22,6 +22,8 @@ date: 2023-11-28
 - [ ] LAYOUT-CONSTRAINTS-001: Create constraint system
 - [ ] LAYOUT-ALGORITHM-001: Implement layout calculation algorithm
 - [ ] LAYOUT-ALIGNMENT-001: Add alignment capabilities
+- [ ] TEXT-WIDTH-MODE-001: Integrate WidthMode selection with layout operations
+- [ ] STYLE-MERGE-STRATEGY-IMPL-001: Border merge (Replace & Preserve) integration in layout-aware containers
 - [ ] LAYOUT-DEMO-001: Create layout demonstration app
 
 ## Technical Focus Areas

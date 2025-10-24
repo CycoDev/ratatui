@@ -1,0 +1,2 @@
+Acknowledgement: C#-Coding-Style-Essential.md will be followed for all subsequent source additions.
+If a generated file appears to violate style, it should be annotated with a TODO and corrected.
