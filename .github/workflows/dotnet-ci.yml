@@ -56,7 +56,14 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Placeholder README check
-        run: |
-          echo "README validation placeholder (BUILD-README-VALIDATION-001)" \
-            && exit 0
+      - name: Build Core (Release)
+        run: dotnet build CycoTui.sln -c Release --no-restore
+      - name: Generate README snapshot
+        run: dotnet run -c Release --project tools/DocGen -- generate --assembly src/CycoTui.Core/bin/Release/net8.0/CycoTui.Core.dll --xml src/CycoTui.Core/bin/Release/net8.0/CycoTui.Core.xml --output README.generated.md
+      - name: Check README freshness
+        run: dotnet run -c Release --project tools/DocGen -- check --assembly src/CycoTui.Core/bin/Release/net8.0/CycoTui.Core.dll --xml src/CycoTui.Core/bin/Release/net8.0/CycoTui.Core.xml --target src/CycoTui.Core/README.md
+      - name: Upload generated README (artifact)
+        uses: actions/upload-artifact@v3
+        with:
+          name: readme-generated
+          path: README.generated.md
