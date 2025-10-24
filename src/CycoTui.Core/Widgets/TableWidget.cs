@@ -9,7 +9,7 @@ using CycoTui.Core.Text;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Simple table widget with header and rows. No scrolling yet.
+/// Simple table widget with header and rows. Supports vertical scrolling via TableState when used statefully.
 /// </summary>
 public sealed class TableWidget : IWidget
 {
