@@ -3,14 +3,12 @@ using System.Text;
 namespace CycoTui.Core.Style;
 
 /// <summary>
-/// <summary>
 /// Converts style transitions into ANSI escape sequences with normalization and minimal resets.
 /// Features:
 /// - Foreground/background set & reset (ESC[39m / ESC[49m)
 /// - Underline color (SGR 58) when supported, or degraded to foreground
 /// - Bold/Dim intensity normalization (ESC[22m)
 /// - Modifier add/remove sequences (italic, underline, blink, invert, hidden, strikethrough)
-/// </summary>
 /// </summary>
 public static class StyleEmitter
 {

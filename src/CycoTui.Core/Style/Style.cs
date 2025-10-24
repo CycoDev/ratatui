@@ -3,11 +3,9 @@ using System;
 namespace CycoTui.Core.Style;
 
 /// <summary>
-/// <summary>
 /// Immutable style descriptor combining optional foreground/background/underline colors and modifier add/remove masks.
 /// Styles are patched (non-null colors override; modifier masks OR'd) rather than replaced.
 /// Underline color emission depends on backend capability or may degrade to foreground.
-/// </summary>
 /// </summary>
 public readonly struct Style : IEquatable<Style>
 {

@@ -21,6 +21,8 @@ public static class GraphemeEnumerator
         {
             yield return e.GetTextElement();
         }
+    }
+
     /// <summary>
     /// Enumerate graphemes with rudimentary ZWJ (zero width joiner) chaining: emoji sequences separated by U+200D
     /// are merged into a single grapheme string.
@@ -38,13 +40,11 @@ public static class GraphemeEnumerator
                 pending = element;
                 continue;
             }
-            // If previous ended with ZWJ or current is ZWJ chain continuation, merge
             if (pending.Contains('\u200D') || element == "\u200D" || (element.StartsWith("\uD83C") && pending.Contains('\u200D')))
             {
                 pending += element;
                 continue;
             }
-            // If current starts with ZWJ (isolated), merge anyway
             if (element.Contains('\u200D'))
             {
                 pending += element;
@@ -54,6 +54,5 @@ public static class GraphemeEnumerator
             pending = element;
         }
         if (pending != null) yield return pending;
-    }
     }
 }

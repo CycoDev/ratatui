@@ -11,7 +11,6 @@ namespace CycoTui.Core.Widgets;
 /// <summary>
 /// Table widget with column constraint distribution, header row, and vertically scrollable body via TableState.
 /// </summary>
-/// </summary>
 public sealed class TableWidget : IWidget
 {
     public IReadOnlyList<TableColumn> Columns { get; init; } = Array.Empty<TableColumn>();
