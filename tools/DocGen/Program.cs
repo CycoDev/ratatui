@@ -1,0 +1,145 @@
+using System.Reflection;
+using System.Xml.Linq;
+
+namespace CycoTui.DocGen;
+
+internal static class Program
+{
+    static int Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.Error.WriteLine("Usage: docgen [generate|check] [--target <readmePath>] [--output <generatedPath>] [--assembly <dllPath>] [--xml <xmlPath>]");
+            return 1;
+        }
+
+        string command = args[0];
+        string target = GetArg(args, "--target") ?? "src/CycoTui.Core/README.md";
+        string output = GetArg(args, "--output") ?? "README.generated.md";
+        string assemblyPath = GetArg(args, "--assembly") ?? "src/CycoTui.Core/bin/Release/net8.0/CycoTui.Core.dll";
+        string xmlPath = GetArg(args, "--xml") ?? Path.ChangeExtension(assemblyPath, ".xml");
+
+        if (!File.Exists(assemblyPath))
+        {
+            Console.Error.WriteLine($"Assembly not found: {assemblyPath}");
+            return 2;
+        }
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML docs not found: {xmlPath}");
+            return 3;
+        }
+
+        var doc = XDocument.Load(xmlPath);
+        var memberDocs = doc.Root?.Element("members")?.Elements("member")
+            .Where(m => m.Attribute("name") != null)
+            .ToDictionary(m => m.Attribute("name")!.Value, m => (string?)m.Element("summary")?.Value.Trim());
+
+        var asm = Assembly.LoadFrom(assemblyPath);
+            // Namespace header
+            sb.AppendLine($"### {ns}\n");
+            foreach (var type in publicTypes.Where(t => t.Namespace == ns))
+            {
+                var xmlKey = XmlMemberKeyForType(type);
+                memberDocs!.TryGetValue(xmlKey, out var summary);
+                sb.AppendLine($"- **{type.Name}**: {Normalize(summary)}");
+            }
+            sb.AppendLine();
+        }
+
+        sb.AppendLine("\n## Detailed Types\n");
+        foreach (var type in publicTypes)
+        {
+            var xmlKey = XmlMemberKeyForType(type);
+            memberDocs!.TryGetValue(xmlKey, out var summary);
+            sb.AppendLine($"### {type.FullName}\n");
+            sb.AppendLine($"{Normalize(summary)}\n");
+            var members = type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                .Where(m => m.MemberType is MemberTypes.Method or MemberTypes.Property)
+                .OrderBy(m => m.Name)
+                .ToList();
+            if (members.Count == 0) continue;
+            sb.AppendLine("#### Members\n");
+            foreach (var member in members)
+            {
+                var memberKey = XmlMemberKeyForMember(type, member);
+                memberDocs!.TryGetValue(memberKey, out var msummary);
+                sb.AppendLine($"- {member.MemberType} {member.Name}: {Normalize(msummary)}");
+            }
+            sb.AppendLine();
+        }
+
+        if (command == "generate")
+        {
+            File.WriteAllText(output, sb.ToString());
+            Console.WriteLine($"Generated {output}");
+            return 0;
+        }
+        else if (command == "check")
+        {
+            if (!File.Exists(target))
+            {
+                Console.Error.WriteLine($"Target README missing: {target}");
+                return 4;
+            }
+            var existing = File.ReadAllText(target);
+            if (!AreEquivalent(existing, sb.ToString()))
+            {
+                Console.Error.WriteLine("README out of date. Run docgen generate to refresh.");
+                return 5;
+            }
+            Console.WriteLine("README is up to date.");
+            return 0;
+        }
+
+        Console.Error.WriteLine($"Unknown command: {command}");
+        return 6;
+    }
+
+    private static string? GetArg(string[] args, string key)
+    {
+        var idx = Array.IndexOf(args, key);
+        if (idx >= 0 && idx + 1 < args.Length) return args[idx + 1];
+        return null;
+    }
+
+    private static string Normalize(string? summary)
+    {
+        if (string.IsNullOrWhiteSpace(summary)) return "(no summary)";
+        return summary.Replace('\n', ' ').Replace("  ", " ").Trim();
+    }
+
+    private static bool AreEquivalent(string a, string b)
+    {
+        string NormalizeAll(string s) => string.Join("\n", s.Split('\n').Select(l => l.Trim()).Where(l => l.Length > 0));
+        return NormalizeAll(a) == NormalizeAll(b);
+    }
+
+    private static string XmlMemberKeyForType(Type t) => $"T:{t.FullName}";
+
+    private static string XmlMemberKeyForMember(Type t, MemberInfo member)
+    {
+        return member.MemberType switch
+        {
+            MemberTypes.Method => $"M:{t.FullName}.{member.Name}{FormatMethodParams((MethodInfo)member)}",
+            MemberTypes.Property => $"P:{t.FullName}.{member.Name}",
+            _ => $"?" // ignored
+        };
+    }
+
+    private static string FormatMethodParams(MethodInfo mi)
+    {
+        var ps = mi.GetParameters();
+        if (ps.Length == 0) return string.Empty;
+        return "(" + string.Join(",", ps.Select(p => p.ParameterType.FullName)) + ")";
+    }
+}
+        var publicTypes = asm.GetExportedTypes().OrderBy(t => t.Namespace).ThenBy(t => t.Name).ToList();
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("# CycoTui Core API Snapshot (Generated)\n");
+        sb.AppendLine("## Overview\nAuto-generated summary of public types. This file is generated by DocGen.");
+        sb.AppendLine("\n## Namespaces\n");
+        var namespaces = publicTypes.Select(t => t.Namespace).Distinct().OrderBy(n => n);
+        foreach (var ns in namespaces)
+            sb.AppendLine($
