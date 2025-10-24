@@ -54,11 +54,16 @@ public sealed class Buffer
     /// <summary>
     /// Retrieve cell at absolute coordinates. Throws if outside bounds.
     /// </summary>
+    /// <param name="x">Column (0-based).</param>
+    /// <param name="y">Row (0-based).</param>
     public Cell GetCell(int x, int y) => _cells[IndexOf(x, y)];
 
     /// <summary>
     /// Attempt to get a cell without throwing, returning false if out of bounds.
     /// </summary>
+    /// <param name="x">Column (0-based).</param>
+    /// <param name="y">Row (0-based).</param>
+    /// <param name="cell">Result cell when true, or <see cref="Cell.Empty"/> when false.</param>
     public bool TryGetCell(int x, int y, out Cell cell)
     {
         if (x < Origin.X || y < Origin.Y || x >= Origin.X + Size.Width || y >= Origin.Y + Size.Height)
@@ -72,6 +77,9 @@ public sealed class Buffer
     /// <summary>
     /// Set a cell value at coordinates, overwriting previous content.
     /// </summary>
+    /// <param name="x">Column (0-based).</param>
+    /// <param name="y">Row (0-based).</param>
+    /// <param name="cell">Cell to store.</param>
     public void SetCell(int x, int y, Cell cell)
     {
         _cells[IndexOf(x, y)] = cell;
@@ -81,6 +89,10 @@ public sealed class Buffer
     /// Write a string starting at (x,y) truncating at buffer width.
     /// Grapheme-aware: multi-width graphemes consume multiple cells with continuation cells flagged Skip.
     /// </summary>
+    /// <param name="x">Column (0-based).</param>
+    /// <param name="y">Row (0-based).</param>
+    /// <param name="text">Text to write; null ignored.</param>
+    /// <param name="style">Style applied to each grapheme.</param>
     public void SetString(int x, int y, string text, Style style)
     {
         if (text == null) return;

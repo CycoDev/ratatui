@@ -9,7 +9,13 @@ using CycoTui.Core.Style;
 namespace CycoTui.Core.Terminal;
 
 /// <summary>
-/// Manages double-buffered rendering using an ITerminalBackend. Phase-2 minimal implementation.
+/// Manages double-buffered rendering using an ITerminalBackend.
+/// Responsibilities:
+/// - Maintain previous and current buffers for diffing
+/// - Invoke user render callback to populate frame
+/// - Diff and emit changed cells + style transitions
+/// - Emit style reset only when styles changed
+/// NOTE: Not thread-safe; single UI thread confinement required.
 /// </summary>
 public sealed class Terminal : IDisposable
 {
@@ -26,6 +32,11 @@ public sealed class Terminal : IDisposable
 
         public string Apply(Style next)
         {
+    /// <summary>
+    /// Create a new terminal with the specified backend and logging context.
+    /// </summary>
+    /// <param name="backend">Backend implementing terminal operations.</param>
+    /// <param name="logging">Logging context (null-safe; provides logger factory).</param>
             if (_current.Equals(next)) return string.Empty;
             var seq = Style.StyleEmitterIntegration(_current, next); // placeholder hook
             _current = next;
@@ -43,6 +54,10 @@ public sealed class Terminal : IDisposable
         _current = Buffer.Empty(size);
     }
 
+    /// <summary>
+    /// Perform a draw cycle: ensure buffer size, create frame, invoke <paramref name="render"/>, diff, emit changes.
+    /// </summary>
+    /// <param name="render">User rendering callback populating the frame.</param>
     public void Draw(Action<Frame> render)
     {
         EnsureSize();
@@ -116,6 +131,7 @@ public sealed class Terminal : IDisposable
         _current = Buffer.Empty(size); // rebuild fresh each frame for now
     }
 
+    /// <summary>Dispose backend and release resources. Safe to call multiple times.</summary>
     public void Dispose()
     {
         if (_disposed) return;
