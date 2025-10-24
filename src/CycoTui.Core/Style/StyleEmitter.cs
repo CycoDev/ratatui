@@ -4,8 +4,12 @@ namespace CycoTui.Core.Style;
 
 /// <summary>
 /// Converts style differences into ANSI escape sequences.
-/// Phase-2: adds modifier removal + intensity normalization (bold/dim).
-/// Reference: IMPLEMENTATION-DECISIONS-001 #5.
+/// Features:
+/// - Foreground/background set & reset (ESC[39m / ESC[49m)
+/// - Underline color (SGR 58) when supported, else optional degrade to foreground
+/// - Bold/Dim intensity normalization via ESC[22m
+/// - Addition/removal of common modifiers (italic, underline, blink, invert, hidden, strikethrough)
+/// Reference: IMPLEMENTATION-DECISIONS-001 #5
 /// </summary>
 public static class StyleEmitter
 {

@@ -4,7 +4,8 @@ namespace CycoTui.Core.Style;
 
 /// <summary>
 /// Represents a composed style: optional foreground/background/underline colors and modifier additions/removals.
-/// This is a minimal phase-1 version; underline color capability will be respected once backends surface it.
+/// Patch semantics: applying another style overlays non-null colors and ORs modifier add/remove sets.
+/// Underline color may be emitted or mapped to foreground depending on backend capability.
 /// </summary>
 public readonly struct Style : IEquatable<Style>
 {
