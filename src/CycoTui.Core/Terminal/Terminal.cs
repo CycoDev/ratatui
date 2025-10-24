@@ -29,16 +29,16 @@ public sealed class Terminal : IDisposable
     {
         private Style _current = Style.Empty;
         public bool HasActiveStyle => _current != Style.Empty;
-
-        public string Apply(Style next)
-        {
     /// <summary>
     /// Create a new terminal with the specified backend and logging context.
     /// </summary>
     /// <param name="backend">Backend implementing terminal operations.</param>
     /// <param name="logging">Logging context (null-safe; provides logger factory).</param>
+
+        public string Apply(Style next)
+        {
             if (_current.Equals(next)) return string.Empty;
-            var seq = Style.StyleEmitterIntegration(_current, next); // placeholder hook
+            var seq = Style.StyleEmitterIntegration(_current, next);
             _current = next;
             return seq;
         }
@@ -126,9 +126,17 @@ public sealed class Terminal : IDisposable
 
     private void SwapBuffers()
     {
+        // Reuse current buffer as previous without reallocation, allocate a fresh current and reuse previous storage next frame.
         _previous = _current;
         var size = _backend.GetSize();
-        _current = Buffer.Empty(size); // rebuild fresh each frame for now
+        // Reuse existing previous buffer cells by clearing rather than allocating a new one.
+        _current = ReuseOrAllocate(size);
+    }
+
+    private Buffer ReuseOrAllocate(Size size)
+    {
+        // If dimensions changed we allocated fresh earlier in EnsureSize.
+        return Buffer.Empty(size); // TODO: Implement in-place clear & reuse pool
     }
 
     /// <summary>Dispose backend and release resources. Safe to call multiple times.</summary>

@@ -9,7 +9,9 @@ namespace CycoTui.Core.Backend;
 public sealed class TestBackend : ITerminalBackend
 {
     private readonly List<CellUpdate> _emitted = new();
+    private readonly List<string> _rawSequences = new();
     public IReadOnlyList<CellUpdate> Emitted => _emitted;
+    public IReadOnlyList<string> RawSequences => _rawSequences;
     public bool ResetEmitted { get; private set; }
 
     public BackendCapabilities Capabilities { get; } = BackendCapabilities.Minimal;
@@ -23,8 +25,9 @@ public sealed class TestBackend : ITerminalBackend
     }
     public void WriteRaw(string sequence)
     {
+        if (string.IsNullOrEmpty(sequence)) return;
+        _rawSequences.Add(sequence);
         if (sequence.Contains("\u001b[0m")) MarkReset();
-        // Optionally capture raw sequences separately later.
     }
     public void Flush() { }
     public Position GetCursorPosition() => new(0,0);
