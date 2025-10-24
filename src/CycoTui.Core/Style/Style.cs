@@ -58,10 +58,10 @@ public readonly struct Style : IEquatable<Style>
     public static bool operator !=(Style left, Style right) => !left.Equals(right);
 
     public override string ToString() => $"Style(Fg={Foreground},Bg={Background},Ul={UnderlineColor},+={AddModifier},-={SubModifier})";
+    internal static string StyleEmitterIntegration(
+        Style from,
+        Style to,
+        bool supportsUnderlineColor = false,
+        bool mapUnderlineToForeground = false) =>
+        StyleEmitter.Emit(from, to, supportsUnderlineColor, mapUnderlineToForeground);
 }
-
-    /// <summary>
-    /// INTERNAL: Terminal integration hook for style transition emission.
-    /// </summary>
-    internal static string StyleEmitterIntegration(Style from, Style to, bool supportsUnderlineColor = false, bool mapUnderlineToForeground = false)
-        => StyleEmitter.Emit(from, to, supportsUnderlineColor, mapUnderlineToForeground);
