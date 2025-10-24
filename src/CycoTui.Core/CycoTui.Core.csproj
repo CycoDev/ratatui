@@ -29,4 +29,9 @@
       <_Parameter1>CycoTui.Core.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Explicit doc generation to troubleshoot missing XML output -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>$(OutputPath)CycoTui.Core.xml</DocumentationFile>
+  </PropertyGroup>
 </Project>
