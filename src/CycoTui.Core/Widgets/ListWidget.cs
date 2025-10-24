@@ -56,8 +56,9 @@ public sealed class ListWidget : IStatefulWidget<ListState>
     public void Render(Frame frame, Rect area, ListState state)
     {
         if (area.Height <= 0 || area.Width <= 0) return;
+        int start = state.Offset;
         int line = 0;
-        for (int i = 0; i < Items.Count && line < area.Height; i++)
+        for (int i = start; i < Items.Count && line < area.Height; i++)
         {
             var item = Items[i];
             var style = (state.Selected.HasValue && state.Selected.Value == i) ? SelectedStyle : ItemStyle;
