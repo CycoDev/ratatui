@@ -1,3 +1,5 @@
+using BufferType = CycoTui.Core.Buffer.Buffer;
+using StyleType = CycoTui.Core.Style.Style;
 using CycoTui.Core.Buffer;
 using CycoTui.Core.Style;
 
@@ -9,7 +11,7 @@ namespace CycoTui.Core.Terminal;
 public sealed class Frame
 {
     /// <summary>The underlying mutable buffer for this frame.</summary>
-    public Buffer Buffer { get; }
+    public BufferType Buffer { get; }
 
     internal Frame(Buffer buffer)
     {
