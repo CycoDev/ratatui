@@ -6,6 +6,9 @@ namespace CycoTui.Core.Layout;
 
 /// <summary>
 /// Distributes space among constraints producing child rectangles.
+/// Precedence order: Length -> Min -> Percentage -> Ratio -> Fill -> Max enforcement.
+/// Handles alignment and margin/padding.
+/// Overflow policy: proportional shrink of Min then Length if mandatory space exceeds available.
 /// </summary>
 public sealed class LayoutEngine
 {
@@ -35,7 +38,7 @@ public sealed class LayoutEngine
         int primarySize = direction == LayoutDirection.Horizontal ? area.Width : area.Height;
         var lengths = new int[constraints.Count];
 
-        // First pass: satisfy Length constraints
+        // First pass: satisfy Length constraints (mandatory)
         int used = 0;
         for (int i = 0; i < constraints.Count; i++)
         {
@@ -47,6 +50,66 @@ public sealed class LayoutEngine
             }
         }
 
+        // Overflow detection (mandatory = lengths from Length + Min targets)
+        int mandatory = 0;
+        for (int i = 0; i < constraints.Count; i++)
+        {
+            var c = constraints[i];
+            if (c.Kind == ConstraintKind.Length) mandatory += lengths[i];
+            else if (c.Kind == ConstraintKind.Min) mandatory += Math.Max(lengths[i], c.Value);
+        }
+        if (mandatory > primarySize)
+        {
+            // Proportionally shrink Min allocations first
+            int minTotal = 0;
+            for (int i = 0; i < constraints.Count; i++) if (constraints[i].Kind == ConstraintKind.Min) minTotal += Math.Max(lengths[i], constraints[i].Value);
+            int excess = mandatory - primarySize;
+            int shrinkTarget = Math.Min(excess, minTotal);
+            if (shrinkTarget > 0 && minTotal > 0)
+            {
+                int shrunk = 0;
+                for (int i = 0; i < constraints.Count; i++)
+                {
+                    var c = constraints[i];
+                    if (c.Kind == ConstraintKind.Min)
+                    {
+                        int cur = Math.Max(lengths[i], c.Value);
+                        int proportional = (int)Math.Floor(shrinkTarget * (cur / (double)minTotal));
+                        int newVal = cur - proportional;
+                        if (newVal < 0) newVal = 0;
+                        lengths[i] = newVal;
+                        shrunk += (cur - newVal);
+                    }
+                }
+                excess -= shrunk;
+            }
+            // If still excess, shrink Length constraints proportionally
+            if (excess > 0)
+            {
+                int lengthTotal = 0;
+                for (int i = 0; i < constraints.Count; i++) if (constraints[i].Kind == ConstraintKind.Length) lengthTotal += lengths[i];
+                if (lengthTotal > 0)
+                {
+                    int shrunk2 = 0;
+                    for (int i = 0; i < constraints.Count; i++)
+                    {
+                        var c = constraints[i];
+                        if (c.Kind == ConstraintKind.Length)
+                        {
+                            int cur = lengths[i];
+                            int proportional = (int)Math.Floor(excess * (cur / (double)lengthTotal));
+                            int newVal = cur - proportional;
+                            if (newVal < 0) newVal = 0;
+                            lengths[i] = newVal;
+                            shrunk2 += (cur - newVal);
+                        }
+                    }
+                }
+            }
+            // Recompute used after shrink
+            used = 0;
+            for (int i = 0; i < lengths.Length; i++) used += lengths[i];
+        }
         // Second pass: Min constraints (ensure minimum if length not set)
         for (int i = 0; i < constraints.Count; i++)
         {
@@ -74,22 +137,36 @@ public sealed class LayoutEngine
 
         // Fourth pass: Ratio constraints share remaining proportionally
         int remaining = primarySize - used;
-        int ratioSum = 0;
-        for (int i = 0; i < constraints.Count; i++) if (constraints[i].Kind == ConstraintKind.Ratio) ratioSum += constraints[i].Value;
-        if (ratioSum > 0 && remaining > 0)
+        double ratioWeightSum = 0.0;
+        for (int i = 0; i < constraints.Count; i++) if (constraints[i].Kind == ConstraintKind.Ratio) ratioWeightSum += constraints[i].Value / (double)constraints[i].Denominator;
+        if (ratioWeightSum > 0 && remaining > 0)
         {
             int allocated = 0;
+            var ratioAllocations = new int[constraints.Count];
             for (int i = 0; i < constraints.Count; i++)
             {
                 var c = constraints[i];
                 if (c.Kind == ConstraintKind.Ratio)
                 {
-                    int alloc = (int)Math.Floor(remaining * (c.Value / (double)ratioSum));
-                    lengths[i] += alloc;
+                    double weight = c.Value / (double)c.Denominator;
+                    int alloc = (int)Math.Floor(remaining * (weight / ratioWeightSum));
+                    ratioAllocations[i] = alloc;
                     allocated += alloc;
                 }
             }
-            remaining -= allocated;
+            // Distribute leftover from flooring
+            int leftover = remaining - allocated;
+            for (int i = 0; i < constraints.Count && leftover > 0; i++)
+            {
+                if (constraints[i].Kind == ConstraintKind.Ratio)
+                {
+                    ratioAllocations[i] += 1;
+                    leftover--;
+                }
+            }
+            // Apply allocations
+            for (int i = 0; i < constraints.Count; i++) if (constraints[i].Kind == ConstraintKind.Ratio) lengths[i] += ratioAllocations[i];
+            remaining = 0;
         }
 
         // Fifth pass: Fill constraints consume remaining equally or by order
