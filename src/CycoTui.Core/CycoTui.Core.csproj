@@ -7,7 +7,6 @@
     <AssemblyName>CycoTui.Core</AssemblyName>
     <RootNamespace>CycoTui.Core</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DocumentationFile>bin/$(Configuration)/$(TargetFramework)/CycoTui.Core.xml</DocumentationFile>
     <Description>Core primitives for CycoTui: geometry, styling, buffer, backend abstractions.</Description>
     <PackageId>CycoTui.Core</PackageId>
     <Authors>CycoTui</Authors>
