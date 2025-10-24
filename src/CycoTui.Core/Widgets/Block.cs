@@ -53,7 +53,7 @@ public sealed class Block : IWidget
 
     private void DrawBorder(Frame frame, Rect area)
     {
-        // Corners
+        // Corners (no merging for now; MergeStrategy.Preserve could skip if cell already occupied)
         frame.SetCell(area.X, area.Y, Border.TopLeft, BorderStyle);
         frame.SetCell(area.X + area.Width - 1, area.Y, Border.TopRight, BorderStyle);
         frame.SetCell(area.X, area.Y + area.Height - 1, Border.BottomLeft, BorderStyle);
@@ -76,6 +76,8 @@ public sealed class Block : IWidget
     {
         if (string.IsNullOrEmpty(Title)) return;
         var titleText = Title!.Length > area.Width - 2 ? Title!.Substring(0, area.Width - 2) : Title!;
+        // TODO: Implement MergeStrategy.Preserve logic by checking existing buffer cell for non-space grapheme.
+
         int startX = area.X + 1;
         frame.WriteString(startX, area.Y, titleText, TitleStyle);
     }
