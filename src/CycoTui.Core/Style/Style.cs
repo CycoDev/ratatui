@@ -62,4 +62,5 @@ public readonly struct Style : IEquatable<Style>
     /// <summary>
     /// INTERNAL: Terminal integration hook for style transition emission.
     /// </summary>
-    internal static string StyleEmitterIntegration(Style from, Style to) => StyleEmitter.Emit(from, to);
+    internal static string StyleEmitterIntegration(Style from, Style to, bool supportsUnderlineColor = false, bool mapUnderlineToForeground = false)
+        => StyleEmitter.Emit(from, to, supportsUnderlineColor, mapUnderlineToForeground);

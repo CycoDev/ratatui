@@ -8,14 +8,16 @@ namespace CycoTui.Core.Backend;
 /// </summary>
 public readonly struct CellData
 {
-    public char Symbol { get; }
+    public string Grapheme { get; }
     public ConsoleColor? Fg { get; }
     public ConsoleColor? Bg { get; }
 
-    public CellData(char symbol, ConsoleColor? fg = null, ConsoleColor? bg = null)
+    public CellData(string grapheme, ConsoleColor? fg = null, ConsoleColor? bg = null)
     {
-        Symbol = symbol;
+        Grapheme = string.IsNullOrEmpty(grapheme) ? " " : grapheme;
         Fg = fg;
         Bg = bg;
     }
+
+    public static CellData FromChar(char c, ConsoleColor? fg = null, ConsoleColor? bg = null) => new(c.ToString(), fg, bg);
 }

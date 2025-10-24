@@ -12,15 +12,15 @@ public static class StyleEmitter
     /// <summary>
     /// Emit ANSI sequences for transitioning from <paramref name="from"/> to <paramref name="to"/>.
     /// </summary>
-    public static string Emit(Style from, Style to)
+    public static string Emit(Style from, Style to, bool supportsUnderlineColor = false, bool mapUnderlineToForeground = false)
     {
         var sb = new StringBuilder();
-        EmitColorChanges(sb, from, to);
+        EmitColorChanges(sb, from, to, supportsUnderlineColor, mapUnderlineToForeground);
         EmitModifierChanges(sb, from, to);
         return sb.ToString();
     }
 
-    private static void EmitColorChanges(StringBuilder sb, Style from, Style to)
+    private static void EmitColorChanges(StringBuilder sb, Style from, Style to, bool supportsUnderlineColor, bool mapUnderlineToForeground)
     {
         // Foreground changes
         if (from.Foreground != to.Foreground)
@@ -46,10 +46,22 @@ public static class StyleEmitter
                 sb.Append("\u001b[49m"); // reset background
             }
         }
-        // Underline color conditional (placeholder: backend capability must be checked externally)
-        if (from.UnderlineColor != to.UnderlineColor && to.UnderlineColor.HasValue)
+        // Underline color conditional
+        if (from.UnderlineColor != to.UnderlineColor)
         {
-            // TODO: emit underline color sequence if backend supports it; placeholder omitted.
+            if (to.UnderlineColor.HasValue && supportsUnderlineColor)
+            {
+                sb.Append(GetAnsiUnderlineColor(to.UnderlineColor.Value));
+            }
+            else if (to.UnderlineColor.HasValue && mapUnderlineToForeground)
+            {
+                sb.Append(GetAnsiForeground(to.UnderlineColor.Value)); // degrade to foreground
+            }
+            else if (from.UnderlineColor.HasValue && supportsUnderlineColor && !to.UnderlineColor.HasValue)
+            {
+                // Reset underline color (fallback: full reset of underline color - often just underline off already handled by modifier removal)
+                // Many terminals do not support explicit reset; rely on modifier removal.
+            }
         }
     }
 
@@ -122,3 +134,14 @@ public static class StyleEmitter
         };
     }
 }
+
+    private static string GetAnsiUnderlineColor(Color color)
+    {
+        return color.Kind switch
+        {
+            ColorKind.Ansi => $"\u001b[58;5;{color.Index}m", // map basic ansi to indexed range
+            ColorKind.Indexed => $"\u001b[58;5;{color.Index}m",
+            ColorKind.Rgb => $"\u001b[58;2;{color.R};{color.G};{color.B}m",
+            _ => string.Empty
+        };
+    }

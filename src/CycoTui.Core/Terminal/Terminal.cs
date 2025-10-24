@@ -38,7 +38,7 @@ public sealed class Terminal : IDisposable
         public string Apply(Style next)
         {
             if (_current.Equals(next)) return string.Empty;
-            var seq = Style.StyleEmitterIntegration(_current, next);
+            var seq = Style.StyleEmitterIntegration(_current, next, _backend.Capabilities.SupportsUnderlineColor, mapUnderlineToForeground: true);
             _current = next;
             return seq;
         }
