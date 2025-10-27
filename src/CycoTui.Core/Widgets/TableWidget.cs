@@ -17,6 +17,7 @@ public sealed class TableWidget : IWidget
     public IReadOnlyList<TableRow> Rows { get; init; } = Array.Empty<TableRow>();
     public StyleType CellStyle { get; init; } = StyleType.Empty;
     public ParagraphAlignment Alignment { get; init; } = ParagraphAlignment.Left;
+    public int HorizontalOffset { get; init; } = 0;
 
     private TableWidget() { }
     public static TableWidget Create() => new();
@@ -35,6 +36,15 @@ public sealed class TableWidget : IWidget
         CellStyle = CellStyle,
         Alignment = Alignment
     };
+    public TableWidget WithHorizontalOffset(int offset) => new()
+    {
+        Columns = Columns,
+        Rows = Rows,
+        CellStyle = CellStyle,
+        Alignment = Alignment,
+        HorizontalOffset = offset
+    };
+
     public TableWidget WithCellStyle(StyleType style) => new()
     {
         Columns = Columns,
@@ -79,7 +89,8 @@ public sealed class TableWidget : IWidget
     private void WriteAligned(Frame frame, Rect rect, int y, string text, StyleType style)
     {
         if (rect.Width <= 0) return;
-        var graphemes = GraphemeEnumerator.EnumerateWithZwj(text ?? string.Empty).ToList();
+        var baseText = text ?? string.Empty;
+        var graphemes = GraphemeEnumerator.EnumerateWithZwj(baseText).ToList();
         int width = 0; foreach (var g in graphemes) width += WidthService.GetWidth(g);
         int offset = Alignment switch
         {
@@ -89,7 +100,13 @@ public sealed class TableWidget : IWidget
             _ => 0
         };
         int x = rect.X + offset;
-        foreach (var g in graphemes)
+        // Apply horizontal offset windowing if needed
+        IEnumerable<string> window = graphemes;
+        if (HorizontalOffset > 0)
+        {
+            window = CycoTui.Core.Text.HorizontalTextScroller.EnumerateVisibleGraphemes(baseText, HorizontalOffset, rect.Width - offset);
+        }
+        foreach (var g in window)
         {
             var w = WidthService.GetWidth(g);
             if (x + w > rect.X + rect.Width) break; // truncate
