@@ -16,6 +16,7 @@ public sealed class ListWidget : IStatefulWidget<ListState>
     public StyleType SelectedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
     public StyleType ItemStyle { get; init; } = StyleType.Empty;
     public bool WrapItems { get; init; } = false; // if true, item text wraps line width
+    public int HorizontalOffset { get; init; } = 0;
 
     private ListWidget() { }
 
@@ -27,6 +28,14 @@ public sealed class ListWidget : IStatefulWidget<ListState>
         SelectedStyle = SelectedStyle,
         ItemStyle = ItemStyle,
         WrapItems = WrapItems
+    };
+    public ListWidget WithHorizontalOffset(int offset) => new()
+    {
+        Items = Items,
+        SelectedStyle = SelectedStyle,
+        ItemStyle = ItemStyle,
+        WrapItems = WrapItems,
+        HorizontalOffset = offset
     };
 
     public ListWidget WithSelectedStyle(StyleType style) => new()
@@ -74,7 +83,12 @@ public sealed class ListWidget : IStatefulWidget<ListState>
         int y = area.Y + lineIndex;
         if (!WrapItems)
         {
-            foreach (var g in GraphemeEnumerator.EnumerateWithZwj(text))
+            var graphemes = GraphemeEnumerator.EnumerateWithZwj(text);
+            if (HorizontalOffset > 0)
+            {
+                graphemes = CycoTui.Core.Text.HorizontalTextScroller.EnumerateVisibleGraphemes(text, HorizontalOffset, area.Width);
+            }
+            foreach (var g in graphemes)
             {
                 if (x >= area.X + area.Width) break;
                 frame.SetCell(x, y, g, style);

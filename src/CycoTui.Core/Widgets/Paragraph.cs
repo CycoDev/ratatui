@@ -14,7 +14,7 @@ public sealed class Paragraph : IWidget
 {
     public string? Text { get; init; }
     public StyleType Style { get; init; } = StyleType.Empty;
-    public int HorizontalOffset { get; init; } = 0;
+    public int HorizontalOffset { get; init; } = 0; // applies when Wrap=false or when windowing wrapped lines
     public ParagraphAlignment Alignment { get; init; } = ParagraphAlignment.Left;
     public bool Wrap { get; init; } = true;
     public int? MaxLines { get; init; }
@@ -72,7 +72,7 @@ public sealed class Paragraph : IWidget
     public void Render(Frame frame, Rect area)
     {
         if (string.IsNullOrEmpty(Text) || area.Width <= 0 || area.Height <= 0) return;
-        var effectiveWidth = (!Wrap && HorizontalOffset > 0) ? area.Width + HorizontalOffset : area.Width;
+        var effectiveWidth = (HorizontalOffset > 0) ? area.Width + HorizontalOffset : area.Width;
         var lines = BuildLines(Text!, effectiveWidth, Wrap);
         int renderLines = MaxLines.HasValue ? Math.Min(MaxLines.Value, lines.Count) : lines.Count;
         for (int i = 0; i < renderLines && i < area.Height; i++)
@@ -88,7 +88,7 @@ public sealed class Paragraph : IWidget
             int x = area.X + offset;
             int y = area.Y + i;
             IEnumerable<string> graphemes = line.Graphemes;
-            if (!Wrap && HorizontalOffset > 0)
+            if (HorizontalOffset > 0)
             {
                 graphemes = CycoTui.Core.Text.HorizontalTextScroller.EnumerateVisibleGraphemes(string.Concat(line.Graphemes), HorizontalOffset, area.Width - offset);
             }
