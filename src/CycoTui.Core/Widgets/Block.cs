@@ -7,7 +7,7 @@ namespace CycoTui.Core.Widgets;
 /// <summary>
 /// Renders a bordered container with optional title. Serves as a foundational container widget.
 /// </summary>
-public sealed class Block : IWidget
+public sealed class Block : IWidget, IContainerWidget
 {
     public string? Title { get; init; }
     public StyleType TitleStyle { get; init; } = StyleType.Empty;
@@ -101,6 +101,8 @@ public sealed class Block : IWidget
         if (innerHeight < 0) innerHeight = 0;
         return new Rect(innerX, innerY, innerWidth, innerHeight);
     }
+
+    public Rect GetContentArea(Rect outerArea) => GetInnerContentRect(outerArea, Padding);
 
     private void DrawTitle(Frame frame, Rect area)
     {
