@@ -13,7 +13,7 @@ public static class BufferDiff
     /// <summary>
     /// Enumerate changed cells between <paramref name="previous"/> and <paramref name="current"/>.
     /// </summary>
-    public static IEnumerable<ChangedCell> EnumerateCellDiff(Buffer previous, Buffer current)
+    public static IEnumerable<ChangedCell> EnumerateCellDiff(BufferType previous, BufferType current)
     {
         if (previous.Size != current.Size)
             throw new ArgumentException("Buffers must have identical size for diff.");
@@ -37,7 +37,7 @@ public static class BufferDiff
     /// <summary>
     /// Enumerate changed segments (contiguous horizontal runs) between two buffers.
     /// </summary>
-    public static IEnumerable<DiffSegment> EnumerateSegments(Buffer previous, Buffer current)
+    public static IEnumerable<DiffSegment> EnumerateSegments(BufferType previous, BufferType current)
     {
         if (previous.Size != current.Size)
             throw new ArgumentException("Buffers must have identical size for diff.");

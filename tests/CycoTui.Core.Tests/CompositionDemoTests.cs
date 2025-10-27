@@ -15,9 +15,9 @@ public class CompositionDemoTests
     public void BlockContainsParagraphAndGauge()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
+        var term = new TerminalType(backend, new LoggingContext(null));
         var block = Block.Create().WithTitle("Stats");
-        var para = Paragraph.Create().WithText("Progress", Style.Empty);
+        var para = Paragraph.Create().WithText("Progress", StyleType.Empty);
         var gauge = GaugeWidget.Create().WithValue(0.3);
         term.Draw(f => {
             var area = new Rect(0,0,20,5);

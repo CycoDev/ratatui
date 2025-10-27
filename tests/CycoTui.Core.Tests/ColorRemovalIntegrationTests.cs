@@ -12,10 +12,10 @@ public class ColorRemovalIntegrationTests
     public void TerminalEmitsColorResetOnForegroundRemoval()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
+        var term = new TerminalType(backend, new LoggingContext(null));
         term.Draw(f => {
-            f.WriteString(0,0,"A", Style.Empty.WithForeground(Color.Red));
-            f.WriteString(1,0,"B", Style.Empty); // removal of foreground color
+            f.WriteString(0,0,"A", StyleType.Empty.WithForeground(Color.Red));
+            f.WriteString(1,0,"B", StyleType.Empty); // removal of foreground color
         });
         // Backend currently only detects style reset; color reset sequences emitted via WriteRaw before final reset are not tracked.
         // TODO: Extend TestBackend to capture raw sequences for detailed assertions.

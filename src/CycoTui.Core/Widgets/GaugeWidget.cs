@@ -10,8 +10,8 @@ namespace CycoTui.Core.Widgets;
 public sealed class GaugeWidget : IWidget
 {
     public double Value { get; init; } = 0.0; // 0..1
-    public Style FilledStyle { get; init; } = Style.Empty.Add(TextModifier.Invert);
-    public Style EmptyStyle { get; init; } = Style.Empty;
+    public StyleType FilledStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
+    public StyleType EmptyStyle { get; init; } = StyleType.Empty;
     public char FilledChar { get; init; } = '█';
     public char EmptyChar { get; init; } = '░';
 
@@ -27,7 +27,7 @@ public sealed class GaugeWidget : IWidget
         EmptyChar = EmptyChar
     };
 
-    public GaugeWidget WithFilledStyle(Style style) => new()
+    public GaugeWidget WithFilledStyle(StyleType style) => new()
     {
         Value = Value,
         FilledStyle = style,
@@ -36,7 +36,7 @@ public sealed class GaugeWidget : IWidget
         EmptyChar = EmptyChar
     };
 
-    public GaugeWidget WithEmptyStyle(Style style) => new()
+    public GaugeWidget WithEmptyStyle(StyleType style) => new()
     {
         Value = Value,
         FilledStyle = FilledStyle,

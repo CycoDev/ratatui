@@ -88,6 +88,7 @@ public sealed class Buffer
         _cells[IndexOf(x, y)] = cell;
     }
 
+
     /// <summary>
     /// Write a string starting at (x,y) truncating at buffer width.
     /// Grapheme-aware: multi-width graphemes consume multiple cells with continuation cells flagged Skip.
@@ -96,7 +97,7 @@ public sealed class Buffer
     /// <param name="y">Row (0-based).</param>
     /// <param name="text">Text to write; null ignored.</param>
     /// <param name="style">Style applied to each grapheme.</param>
-    public void SetString(int x, int y, string text, Style style)
+    public void SetString(int x, int y, string text, StyleType style)
     {
         if (text == null) return;
         int cx = x;
@@ -104,6 +105,16 @@ public sealed class Buffer
         {
             var w = CycoTui.Core.Text.WidthService.GetWidth(grapheme);
             if (cx >= Origin.X + Size.Width) break;
+            // Invalidate trailing continuation cells if previous head at this position was wider than new grapheme width.
+            if (TryGetCell(cx, y, out var existingHead) && existingHead.Width > 1 && existingHead.Width > w)
+            {
+                for (int k = 1; k < existingHead.Width; k++)
+                {
+                    int nx = cx + k;
+                    if (nx >= Origin.X + Size.Width) break;
+                    _cells[IndexOf(nx, y)] = Cell.Empty;
+                }
+            }
             _cells[IndexOf(cx, y)] = new Cell(grapheme, style, (byte)w, false);
             for (int k = 1; k < w; k++)
             {
@@ -113,5 +124,6 @@ public sealed class Buffer
             }
             cx += w;
         }
+
     }
 }

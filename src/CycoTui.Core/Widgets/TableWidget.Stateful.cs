@@ -35,17 +35,17 @@ public static class TableWidgetStatefulExtensions
     }
 
     private static void tableRenderRow(Frame frame, System.Collections.Generic.IReadOnlyList<Rect> colRects, int y,
-        System.Collections.Generic.IReadOnlyList<(string Text, Style Style)> cells, Style fallback, ParagraphAlignment alignment)
+        System.Collections.Generic.IReadOnlyList<(string Text, StyleType Style)> cells, StyleType fallback, ParagraphAlignment alignment)
     {
         for (int i = 0; i < colRects.Count && i < cells.Count; i++)
         {
             var (text, style) = cells[i];
             var rect = colRects[i];
-            WriteAligned(frame, rect, y, text, style == Style.Empty ? fallback : style, alignment);
+            WriteAligned(frame, rect, y, text, style == StyleType.Empty ? fallback : style, alignment);
         }
     }
 
-    private static void WriteAligned(Frame frame, Rect rect, int y, string text, Style style, ParagraphAlignment alignment)
+    private static void WriteAligned(Frame frame, Rect rect, int y, string text, StyleType style, ParagraphAlignment alignment)
     {
         if (rect.Width <= 0) return;
         var graphemes = CycoTui.Core.Text.GraphemeEnumerator.EnumerateWithZwj(text ?? string.Empty).ToList();

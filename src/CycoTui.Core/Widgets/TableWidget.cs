@@ -15,7 +15,7 @@ public sealed class TableWidget : IWidget
 {
     public IReadOnlyList<TableColumn> Columns { get; init; } = Array.Empty<TableColumn>();
     public IReadOnlyList<TableRow> Rows { get; init; } = Array.Empty<TableRow>();
-    public Style CellStyle { get; init; } = Style.Empty;
+    public StyleType CellStyle { get; init; } = StyleType.Empty;
     public ParagraphAlignment Alignment { get; init; } = ParagraphAlignment.Left;
 
     private TableWidget() { }
@@ -35,7 +35,7 @@ public sealed class TableWidget : IWidget
         CellStyle = CellStyle,
         Alignment = Alignment
     };
-    public TableWidget WithCellStyle(Style style) => new()
+    public TableWidget WithCellStyle(StyleType style) => new()
     {
         Columns = Columns,
         Rows = Rows,
@@ -66,7 +66,7 @@ public sealed class TableWidget : IWidget
         }
     }
 
-    private void RenderRow(Frame frame, IReadOnlyList<Rect> colRects, int y, IReadOnlyList<(string Text, Style Style)> cells)
+    private void RenderRow(Frame frame, IReadOnlyList<Rect> colRects, int y, IReadOnlyList<(string Text, StyleType Style)> cells)
     {
         for (int i = 0; i < colRects.Count && i < cells.Count; i++)
         {
@@ -76,7 +76,7 @@ public sealed class TableWidget : IWidget
         }
     }
 
-    private void WriteAligned(Frame frame, Rect rect, int y, string text, Style style)
+    private void WriteAligned(Frame frame, Rect rect, int y, string text, StyleType style)
     {
         if (rect.Width <= 0) return;
         var graphemes = GraphemeEnumerator.EnumerateWithZwj(text ?? string.Empty).ToList();
@@ -93,7 +93,7 @@ public sealed class TableWidget : IWidget
         {
             var w = WidthService.GetWidth(g);
             if (x + w > rect.X + rect.Width) break; // truncate
-            frame.SetCell(x, y, g, style == Style.Empty ? CellStyle : style);
+            frame.SetCell(x, y, g, style == StyleType.Empty ? CellStyle : style);
             x += w;
         }
     }

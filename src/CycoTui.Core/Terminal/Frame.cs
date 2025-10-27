@@ -1,5 +1,3 @@
-using BufferType = CycoTui.Core.Buffer.Buffer;
-using StyleType = CycoTui.Core.Style.Style;
 using CycoTui.Core.Buffer;
 using CycoTui.Core.Style;
 
@@ -13,10 +11,12 @@ public sealed class Frame
     /// <summary>The underlying mutable buffer for this frame.</summary>
     public BufferType Buffer { get; }
 
-    internal Frame(Buffer buffer)
+    internal Frame(BufferType buffer)
     {
         Buffer = buffer;
     }
+    public bool TryGetCell(int x, int y, out CycoTui.Core.Buffer.Cell cell) => Buffer.TryGetCell(x, y, out cell);
+
 
     /// <summary>
     /// Write a string at (x,y) using the provided style. Grapheme clusters are measured and may span multiple cells.
@@ -25,7 +25,7 @@ public sealed class Frame
     /// <param name="y">Row (0-based).</param>
     /// <param name="text">Text to write (null safe; ignored if null).</param>
     /// <param name="style">Style applied to each grapheme.</param>
-    public void WriteString(int x, int y, string text, Style style)
+    public void WriteString(int x, int y, string text, StyleType style)
     {
         Buffer.SetString(x, y, text, style);
     }
@@ -33,7 +33,7 @@ public sealed class Frame
     /// <summary>
     /// Set a single grapheme at (x,y). Caller must ensure area bounds.
     /// </summary>
-    public void SetCell(int x, int y, string grapheme, Style style)
+    public void SetCell(int x, int y, string grapheme, StyleType style)
     {
         Buffer.SetCell(x, y, new Cell(grapheme, style));
     }

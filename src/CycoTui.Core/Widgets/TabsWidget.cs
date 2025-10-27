@@ -12,21 +12,21 @@ namespace CycoTui.Core.Widgets;
 /// </summary>
 public sealed class TabsWidget : IStatefulWidget<int>
 {
-    public IReadOnlyList<(string Label, Style Style)> Tabs { get; init; } = Array.Empty<(string, Style)>();
-    public Style SelectedStyle { get; init; } = Style.Empty.Add(TextModifier.Underline);
+    public IReadOnlyList<(string Label, StyleType Style)> Tabs { get; init; } = Array.Empty<(string, StyleType)>();
+    public StyleType SelectedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Underline);
     public ParagraphAlignment Alignment { get; init; } = ParagraphAlignment.Left;
 
     private TabsWidget() { }
     public static TabsWidget Create() => new();
 
-    public TabsWidget WithTabs(IReadOnlyList<(string Label, Style Style)> tabs) => new()
+    public TabsWidget WithTabs(IReadOnlyList<(string Label, StyleType Style)> tabs) => new()
     {
         Tabs = tabs,
         SelectedStyle = SelectedStyle,
         Alignment = Alignment
     };
 
-    public TabsWidget WithSelectedStyle(Style style) => new()
+    public TabsWidget WithSelectedStyle(StyleType style) => new()
     {
         Tabs = Tabs,
         SelectedStyle = style,
@@ -44,7 +44,7 @@ public sealed class TabsWidget : IStatefulWidget<int>
     {
         if (area.Width <= 0 || area.Height <= 0 || Tabs.Count == 0) return;
         // Compute total width of labels (including a single space between)
-        var segments = new List<(List<string> Graphemes, Style Style, int Width)>();
+        var segments = new List<(List<string> Graphemes, StyleType Style, int Width)>();
         foreach (var (Label, Style) in Tabs)
         {
             var gs = new List<string>();
@@ -76,7 +76,7 @@ public sealed class TabsWidget : IStatefulWidget<int>
             }
             if (i < segments.Count - 1 && x < area.X + area.Width)
             {
-                frame.SetCell(x, y, " ", Style.Empty);
+                frame.SetCell(x, y, " ", StyleType.Empty);
                 x += 1;
             }
         }

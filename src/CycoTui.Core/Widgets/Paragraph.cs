@@ -13,7 +13,7 @@ namespace CycoTui.Core.Widgets;
 public sealed class Paragraph : IWidget
 {
     public string? Text { get; init; }
-    public Style Style { get; init; } = Style.Empty;
+    public StyleType Style { get; init; } = StyleType.Empty;
     public ParagraphAlignment Alignment { get; init; } = ParagraphAlignment.Left;
     public bool Wrap { get; init; } = true;
     public int? MaxLines { get; init; }
@@ -22,7 +22,7 @@ public sealed class Paragraph : IWidget
 
     public static Paragraph Create() => new();
 
-    public Paragraph WithText(string? text, Style? style = null) => new()
+    public Paragraph WithText(string? text, StyleType? style = null) => new()
     {
         Text = text,
         Style = style ?? Style,

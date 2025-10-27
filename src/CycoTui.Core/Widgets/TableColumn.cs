@@ -9,10 +9,10 @@ namespace CycoTui.Core.Widgets;
 public sealed class TableColumn
 {
     public string Header { get; }
-    public Style HeaderStyle { get; }
+    public StyleType HeaderStyle { get; }
     public Constraint Constraint { get; }
 
-    public TableColumn(string header, Constraint constraint, Style headerStyle)
+    public TableColumn(string header, Constraint constraint, StyleType headerStyle)
     {
         Header = header;
         Constraint = constraint;

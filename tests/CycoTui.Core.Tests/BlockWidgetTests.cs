@@ -14,7 +14,7 @@ public class BlockWidgetTests
     public void BlockRendersBorder()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
+        var term = new TerminalType(backend, new LoggingContext(null));
         var block = Block.Create().WithTitle("Title");
         term.Draw(f => block.Render(f, new Rect(0,0,10,5)));
         // Check some corner cells

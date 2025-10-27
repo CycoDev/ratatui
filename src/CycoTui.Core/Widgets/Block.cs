@@ -10,29 +10,32 @@ namespace CycoTui.Core.Widgets;
 public sealed class Block : IWidget
 {
     public string? Title { get; init; }
-    public Style TitleStyle { get; init; } = Style.Empty;
+    public StyleType TitleStyle { get; init; } = StyleType.Empty;
     public BlockBorderStyle Border { get; init; } = BlockBorderStyle.SingleLine;
     public Padding Padding { get; init; } = Padding.Zero;
-    public Style BorderStyle { get; init; } = Style.Empty;
+    public MergeStrategy MergeStrategy { get; init; } = MergeStrategy.Replace;
+    public StyleType BorderStyle { get; init; } = StyleType.Empty;
 
     private Block() { }
 
     public static Block Create() => new();
-    public Block WithTitle(string? title, Style? style = null) => new()
+    public Block WithTitle(string? title, StyleType? style = null) => new()
     {
         Title = title,
         TitleStyle = style ?? TitleStyle,
         Border = Border,
         Padding = Padding,
-        BorderStyle = BorderStyle
+        BorderStyle = BorderStyle,
+        MergeStrategy = MergeStrategy
     };
-    public Block WithBorder(BlockBorderStyle border, Style? style = null) => new()
+    public Block WithBorder(BlockBorderStyle border, StyleType? style = null) => new()
     {
         Title = Title,
         TitleStyle = TitleStyle,
         Border = border,
         Padding = Padding,
-        BorderStyle = style ?? BorderStyle
+        BorderStyle = style ?? BorderStyle,
+        MergeStrategy = MergeStrategy
     };
     public Block WithPadding(Padding padding) => new()
     {
@@ -40,7 +43,17 @@ public sealed class Block : IWidget
         TitleStyle = TitleStyle,
         Border = Border,
         Padding = padding,
-        BorderStyle = BorderStyle
+        BorderStyle = BorderStyle,
+        MergeStrategy = MergeStrategy
+    };
+    public Block WithMergeStrategy(MergeStrategy strategy) => new()
+    {
+        Title = Title,
+        TitleStyle = TitleStyle,
+        Border = Border,
+        Padding = Padding,
+        BorderStyle = BorderStyle,
+        MergeStrategy = strategy
     };
 
     public void Render(Frame frame, Rect area)
@@ -48,36 +61,51 @@ public sealed class Block : IWidget
         if (area.Width < 2 || area.Height < 2) return; // not enough space for border
         DrawBorder(frame, area);
         DrawTitle(frame, area);
-        // Inner content area would be returned for nested rendering (future API returns Rect)
     }
 
     private void DrawBorder(Frame frame, Rect area)
     {
-        // Corners (no merging for now; MergeStrategy.Preserve could skip if cell already occupied)
-        frame.SetCell(area.X, area.Y, Border.TopLeft, BorderStyle);
-        frame.SetCell(area.X + area.Width - 1, area.Y, Border.TopRight, BorderStyle);
-        frame.SetCell(area.X, area.Y + area.Height - 1, Border.BottomLeft, BorderStyle);
-        frame.SetCell(area.X + area.Width - 1, area.Y + area.Height - 1, Border.BottomRight, BorderStyle);
-        // Horizontal lines
+        TrySet(frame, area.X, area.Y, Border.TopLeft, BorderStyle);
+        TrySet(frame, area.X + area.Width - 1, area.Y, Border.TopRight, BorderStyle);
+        TrySet(frame, area.X, area.Y + area.Height - 1, Border.BottomLeft, BorderStyle);
+        TrySet(frame, area.X + area.Width - 1, area.Y + area.Height - 1, Border.BottomRight, BorderStyle);
         for (int x = area.X + 1; x < area.X + area.Width - 1; x++)
         {
-            frame.SetCell(x, area.Y, Border.Top, BorderStyle);
-            frame.SetCell(x, area.Y + area.Height - 1, Border.Bottom, BorderStyle);
+            TrySet(frame, x, area.Y, Border.Top, BorderStyle);
+            TrySet(frame, x, area.Y + area.Height - 1, Border.Bottom, BorderStyle);
         }
-        // Vertical lines
         for (int y = area.Y + 1; y < area.Y + area.Height - 1; y++)
         {
-            frame.SetCell(area.X, y, Border.Left, BorderStyle);
-            frame.SetCell(area.X + area.Width - 1, y, Border.Right, BorderStyle);
+            TrySet(frame, area.X, y, Border.Left, BorderStyle);
+            TrySet(frame, area.X + area.Width - 1, y, Border.Right, BorderStyle);
         }
+    }
+
+    private void TrySet(Frame frame, int x, int y, string grapheme, StyleType style)
+    {
+        if (MergeStrategy == MergeStrategy.Preserve && frame.TryGetCell(x, y, out var existing))
+        {
+            if (!string.IsNullOrWhiteSpace(existing.Grapheme) && existing.Grapheme != " ")
+                return;
+        }
+        frame.SetCell(x, y, grapheme, style);
+    }
+
+    public static Rect GetInnerContentRect(Rect area, Padding padding)
+    {
+        var innerX = area.X + 1 + padding.Left;
+        var innerY = area.Y + 1 + padding.Top;
+        var innerWidth = area.Width - 2 - padding.Left - padding.Right;
+        var innerHeight = area.Height - 2 - padding.Top - padding.Bottom;
+        if (innerWidth < 0) innerWidth = 0;
+        if (innerHeight < 0) innerHeight = 0;
+        return new Rect(innerX, innerY, innerWidth, innerHeight);
     }
 
     private void DrawTitle(Frame frame, Rect area)
     {
         if (string.IsNullOrEmpty(Title)) return;
         var titleText = Title!.Length > area.Width - 2 ? Title!.Substring(0, area.Width - 2) : Title!;
-        // TODO: Implement MergeStrategy.Preserve logic by checking existing buffer cell for non-space grapheme.
-
         int startX = area.X + 1;
         frame.WriteString(startX, area.Y, titleText, TitleStyle);
     }

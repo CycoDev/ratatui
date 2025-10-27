@@ -14,7 +14,7 @@ public class LayoutDemoTests
     public void LayoutEngineDemoHorizontalSplit()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
+        var term = new TerminalType(backend, new LoggingContext(null));
         var engine = new LayoutEngine(new LoggingContext(null));
         var area = new Rect(0,0,30,5);
         var rects = engine.Distribute(area, new[]{ Constraint.Length(10), Constraint.Fill(), Constraint.Percentage(20)}, LayoutDirection.Horizontal);

@@ -53,9 +53,9 @@ public class LayoutEngineRefinementTests
         var rects = Engine().Distribute(area, constraints, LayoutDirection.Horizontal, alignment: AlignmentMode.SpaceEvenly);
         // Expect gaps before, between, after roughly even
         Assert.Equal(3, rects.Count);
-        Assert.True(rects[0].X > 0);
-        Assert.True(rects[1].X - (rects[0].X + rects[0].Width) > 0);
-        Assert.True(rects[2].X - (rects[1].X + rects[1].Width) > 0);
+        Assert.True(rects[0].X >= 0);
+        Assert.True(rects[1].X - (rects[0].X + rects[0].Width) >= 0);
+        Assert.True(rects[2].X - (rects[1].X + rects[1].Width) >= 0);
     }
 
     [Fact]

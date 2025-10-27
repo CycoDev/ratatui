@@ -40,7 +40,7 @@ public class LayoutEngineTests
         var area = new Rect(0,0,60,5);
         var constraints = new[]{ Constraint.Ratio(1,1), Constraint.Ratio(2,1), Constraint.Ratio(3,1)}; // weights 1,2,3
         var rects = engine.Distribute(area, constraints, LayoutDirection.Horizontal);
-        Assert.Equal(10, rects[0].Width + rects[1].Width + rects[2].Width <= 60); // sanity
+        Assert.True(rects[0].Width + rects[1].Width + rects[2].Width <= 60); // sanity
         Assert.True(rects[0].Width < rects[1].Width && rects[1].Width < rects[2].Width);
     }
 

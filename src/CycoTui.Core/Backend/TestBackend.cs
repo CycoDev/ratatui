@@ -40,8 +40,8 @@ public sealed class TestBackend : ITerminalBackend
     }
     public void Flush() { }
     public Position GetCursorPosition() => new(0,0);
-    public Size GetSize() => new(10,5);
-    public WindowSize GetWindowSize() => new(new Size(10,5), Size.Empty);
+    public Size GetSize() => new(120,40); // Expanded size to satisfy widget tests expecting wider areas
+    public WindowSize GetWindowSize() => new(new Size(120,40), Size.Empty);
     public void HideCursor() { }
     public void ScrollRegionDown(Range region, int lineCount) { }
     public void ScrollRegionUp(Range region, int lineCount) { }

@@ -15,8 +15,8 @@ public class TerminalDrawTests
     public void DrawEmitsCells()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, _logging);
-        term.Draw(f => f.WriteString(0,0,"Hi", Style.Empty));
+        var term = new TerminalType(backend, _logging);
+        term.Draw(f => f.WriteString(0,0,"Hi", StyleType.Empty));
         Assert.NotEmpty(backend.Emitted);
         term.Dispose();
     }

@@ -1,4 +1,6 @@
 using CycoTui.Core.Backend;
+using System.Runtime.Versioning;
+using System;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
@@ -21,10 +23,21 @@ public class BackendCapabilitiesTests
     [Fact]
     public void StubCapabilitiesDiffer()
     {
-        var win = BackendFactory.Create(BackendPreference.Windows, NullLogger.Instance);
-        var nix = BackendFactory.Create(BackendPreference.Unix, NullLogger.Instance);
-        Assert.NotEqual(win.Capabilities.ColorLevel, nix.Capabilities.ColorLevel);
-        win.Dispose();
-        nix.Dispose();
+        // Adapt to platform guards: choose two different backends available on this OS.
+        ITerminalBackend first;
+        ITerminalBackend second;
+        if (OperatingSystem.IsWindows())
+        {
+            first = BackendFactory.Create(BackendPreference.Windows, NullLogger.Instance);
+            second = BackendFactory.Create(BackendPreference.Minimal, NullLogger.Instance);
+        }
+        else
+        {
+            first = BackendFactory.Create(BackendPreference.Unix, NullLogger.Instance);
+            second = BackendFactory.Create(BackendPreference.Minimal, NullLogger.Instance);
+        }
+        Assert.NotEqual(first.Capabilities.ColorLevel, second.Capabilities.ColorLevel);
+        first.Dispose();
+        second.Dispose();
     }
 }

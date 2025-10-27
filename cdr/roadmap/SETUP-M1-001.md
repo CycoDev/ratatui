@@ -1,7 +1,7 @@
 ---
 id: SETUP-M1-001
 title: Project Setup and Foundation
-status: planned
+status: in-progress
 date: 2023-11-28
 ---
 

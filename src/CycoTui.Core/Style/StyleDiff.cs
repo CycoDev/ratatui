@@ -5,7 +5,7 @@ namespace CycoTui.Core.Style;
 /// <summary>
 /// Computes difference between two modifier sets.
 /// Phase-1: simple added/removed calculation.
-/// TODO (IMPLEMENTATION-DECISIONS-001 #5): add Bold/Dim intensity normalization logic and minimal ANSI sequence emission ordering.
+/// Intensity (Bold/Dim) normalization: if either Bold or Dim changes, reset both then apply new set to avoid conflicting states.
 /// </summary>
 public readonly struct StyleDiff
 {

@@ -8,7 +8,7 @@ namespace CycoTui.Core.Widgets;
 /// </summary>
 public sealed class TableRow
 {
-    public IReadOnlyList<(string Text, Style Style)> Cells { get; }
+    public IReadOnlyList<(string Text, StyleType Style)> Cells { get; }
 
-    public TableRow(IReadOnlyList<(string Text, Style Style)> cells) => Cells = cells;
+    public TableRow(IReadOnlyList<(string Text, StyleType Style)> cells) => Cells = cells;
 }

@@ -8,10 +8,10 @@ public class StyleTests
     [Fact]
     public void PatchMergesNonNullColorsAndOrsModifiers()
     {
-        var baseStyle = Style.Empty
+        var baseStyle = StyleType.Empty
             .WithForeground(Color.Red)
             .Add(TextModifier.Bold);
-        var overlay = Style.Empty
+        var overlay = StyleType.Empty
             .WithBackground(Color.Blue)
             .Add(TextModifier.Italic);
 
@@ -25,7 +25,7 @@ public class StyleTests
     [Fact]
     public void RemoveModifierMovesItToSub()
     {
-        var style = Style.Empty.Add(TextModifier.Bold);
+        var style = StyleType.Empty.Add(TextModifier.Bold);
         var removed = style.Remove(TextModifier.Bold);
         Assert.True((removed.AddModifier & TextModifier.Bold) == 0);
         Assert.True((removed.SubModifier & TextModifier.Bold) != 0);

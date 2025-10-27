@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using CycoTui.Core.Terminal;
 using CycoTui.Core.Backend;
 using CycoTui.Core.Style;
 using CycoTui.Core.Logging;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace CycoTui.Core.Tests;
@@ -35,11 +37,11 @@ public class LoggingInstrumentationTests
     public void TerminalLogsChangedSegments()
     {
         using var provider = new ListLoggerProvider();
-        var factory = LoggerFactory.Create(b => b.AddProvider(provider));
+        var factory = Microsoft.Extensions.Logging.LoggerFactory.Create(b => b.AddProvider(provider));
         var loggingCtx = new LoggingContext(factory);
         var backend = new TestBackend();
-        var term = new Terminal(backend, loggingCtx);
-        term.Draw(f => f.WriteString(0,0,"Hello", Style.Empty));
+        var term = new TerminalType(backend, loggingCtx);
+        term.Draw(f => f.WriteString(0,0,"Hello", StyleType.Empty));
         Assert.Contains(provider.Messages, m => m.Contains("Changed segments"));
     }
 }

@@ -15,8 +15,8 @@ public class TabsWidgetTests
     public void TabsRenderSelectedUnderline()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
-        var tabs = new[]{ ("Tab1", Style.Empty), ("Tab2", Style.Empty) };
+        var term = new TerminalType(backend, new LoggingContext(null));
+        var tabs = new[]{ ("Tab1", StyleType.Empty), ("Tab2", StyleType.Empty) };
         var widget = TabsWidget.Create().WithTabs(tabs);
         term.Draw(f => widget.Render(f, new Rect(0,0,20,1), 1));
         // Check second tab label presence

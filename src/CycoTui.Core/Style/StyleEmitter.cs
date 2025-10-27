@@ -6,7 +6,7 @@ namespace CycoTui.Core.Style;
 public static class StyleEmitter
 {
     /// <summary>Emit ANSI sequences representing transition from one style to another.</summary>
-    public static string Emit(Style from, Style to, bool supportsUnderlineColor = false, bool mapUnderlineToForeground = false)
+    public static string Emit(StyleType from, StyleType to, bool supportsUnderlineColor = false, bool mapUnderlineToForeground = false)
     {
         var sb = new StringBuilder();
         EmitColorChanges(sb, from, to, supportsUnderlineColor, mapUnderlineToForeground);
@@ -14,7 +14,7 @@ public static class StyleEmitter
         return sb.ToString();
     }
 
-    private static void EmitColorChanges(StringBuilder sb, Style from, Style to, bool supportsUnderlineColor, bool mapUnderlineToForeground)
+    private static void EmitColorChanges(StringBuilder sb, StyleType from, StyleType to, bool supportsUnderlineColor, bool mapUnderlineToForeground)
     {
         if (from.Foreground != to.Foreground)
         {
@@ -33,7 +33,7 @@ public static class StyleEmitter
         }
     }
 
-    private static void EmitModifierChanges(StringBuilder sb, Style from, Style to)
+    private static void EmitModifierChanges(StringBuilder sb, StyleType from, StyleType to)
     {
         var fromMods = from.AddModifier;
         var toMods = to.AddModifier;

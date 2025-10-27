@@ -15,8 +15,8 @@ public class ListWidgetTests
     public void ListRendersItemsAndHighlightSelected()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
-        var items = new[]{ new ListItem("One", Style.Empty), new ListItem("Two", Style.Empty) };
+        var term = new TerminalType(backend, new LoggingContext(null));
+        var items = new[]{ new ListItem("One", StyleType.Empty), new ListItem("Two", StyleType.Empty) };
         var state = new ListState();
         state.Select(1);
         var list = ListWidget.Create().WithItems(items);

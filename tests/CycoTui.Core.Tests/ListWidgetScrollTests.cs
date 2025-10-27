@@ -15,8 +15,8 @@ public class ListWidgetScrollTests
     public void ListScrollsAndSelectedStaysVisible()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
-        var items = Enumerable.Range(0, 15).Select(i => new ListItem($"Item{i}", Style.Empty)).ToArray();
+        var term = new TerminalType(backend, new LoggingContext(null));
+        var items = Enumerable.Range(0, 15).Select(i => new ListItem($"Item{i}", StyleType.Empty)).ToArray();
         var list = ListWidget.Create().WithItems(items);
         var state = new ListState(count: items.Length);
         state.Select(0);

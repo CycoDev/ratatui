@@ -40,6 +40,10 @@ public static class BackendFactory
 
         if (Registry.TryGetValue(preference, out var factory))
         {
+            if (preference == BackendPreference.Windows && !OperatingSystem.IsWindows())
+                throw new PlatformNotSupportedException("Windows backend requested on non-Windows platform.");
+            if (preference == BackendPreference.Unix && !(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
+                throw new PlatformNotSupportedException("Unix backend requested on non-Unix platform.");
             return factory(logger);
         }
 

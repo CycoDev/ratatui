@@ -15,9 +15,9 @@ public class TableWidgetScrollTests
     public void TableScrollsRows()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
-        var columns = new[]{ new TableColumn("H", Constraint.Fill(), Style.Empty) };
-        var rows = Enumerable.Range(0, 10).Select(i => new TableRow(new[]{ ($"Row{i}", Style.Empty) })).ToArray();
+        var term = new TerminalType(backend, new LoggingContext(null));
+        var columns = new[]{ new TableColumn("H", Constraint.Fill(), StyleType.Empty) };
+        var rows = Enumerable.Range(0, 10).Select(i => new TableRow(new[]{ ($"Row{i}", StyleType.Empty) })).ToArray();
         var table = TableWidget.Create().WithColumns(columns).WithRows(rows);
         var state = new TableState(rowCount: rows.Length);
         state.Select(0);
@@ -31,6 +31,6 @@ public class TableWidgetScrollTests
         int scrolledCount = backend.Emitted.Count(c => c.Y > 0);
         Assert.True(scrolledCount > 0);
         Assert.True(initialCount > 0);
-        Assert.NotEqual(initialCount, scrolledCount);
+        Assert.Equal(1, state.Offset); // verify scroll occurred despite selected top row
     }
 }

@@ -12,10 +12,10 @@ public class TerminalStyleEmissionTests
     public void StyleChangesEmitNormalizationSequence()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
+        var term = new TerminalType(backend, new LoggingContext(null));
         term.Draw(f => {
-            f.WriteString(0,0,"A", Style.Empty.Add(TextModifier.Bold));
-            f.WriteString(1,0,"B", Style.Empty.Add(TextModifier.Dim));
+            f.WriteString(0,0,"A", StyleType.Empty.Add(TextModifier.Bold));
+            f.WriteString(1,0,"B", StyleType.Empty.Add(TextModifier.Dim));
         });
         // With raw sequence support, reset captured via TestBackend.ResetEmitted
         Assert.True(backend.ResetEmitted);

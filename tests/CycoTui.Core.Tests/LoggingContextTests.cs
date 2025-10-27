@@ -18,7 +18,7 @@ public class LoggingContextTests
     [Fact]
     public void CreatesLoggerFromFactory()
     {
-        using var factory = LoggerFactory.Create(b => b.AddFilter(_ => false));
+        using var factory = Microsoft.Extensions.Logging.LoggerFactory.Create(b => b.AddFilter(_ => false));
         var ctx = new LoggingContext(factory);
         var logger = ctx.GetLogger("CustomCategory");
         Assert.NotNull(logger);

@@ -8,9 +8,9 @@ namespace CycoTui.Core.Widgets;
 public sealed class ListItem
 {
     public string Text { get; }
-    public Style Style { get; }
+    public StyleType Style { get; }
 
-    public ListItem(string text, Style style)
+    public ListItem(string text, StyleType style)
     {
         Text = text;
         Style = style;

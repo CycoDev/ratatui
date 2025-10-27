@@ -12,9 +12,9 @@ public class TestBackendScrollbackTests
     public void FramesCapturePerDrawCall()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
-        term.Draw(f => f.WriteString(0,0,"A", Style.Empty));
-        term.Draw(f => f.WriteString(0,0,"B", Style.Empty));
+        var term = new TerminalType(backend, new LoggingContext(null));
+        term.Draw(f => f.WriteString(0,0,"A", StyleType.Empty));
+        term.Draw(f => f.WriteString(0,0,"B", StyleType.Empty));
         Assert.Equal(2, backend.Frames.Count);
         Assert.Single(backend.Frames[0]);
         Assert.Single(backend.Frames[1]);

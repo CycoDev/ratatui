@@ -13,8 +13,8 @@ public class MultiWidthCellTests
     public void EmojiOccupiesTwoCellsAndSecondIsSkip()
     {
         WidthService.SetMode(WidthMode.Standard);
-        var buf = Buffer.Empty(new Size(5,1));
-        buf.SetString(0,0,"🙂A", Style.Empty); // emoji width 2 then A
+        var buf = BufferType.Empty(new Size(5,1));
+        buf.SetString(0,0,"🙂A", StyleType.Empty); // emoji width 2 then A
         var first = buf.GetCell(0,0);
         var second = buf.GetCell(1,0);
         var third = buf.GetCell(2,0);

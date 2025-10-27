@@ -18,7 +18,7 @@ public sealed class TableState
     {
         if (row.HasValue && (row < 0 || row >= RowCount)) return;
         SelectedRow = row;
-        EnsureVisible();
+        EnsureVisible(viewportHeight:5); // TODO: remove hard-coded guess; require explicit viewport
     }
 
     public void Next(int viewportHeight)
@@ -50,7 +50,8 @@ public sealed class TableState
     private void EnsureVisible(int viewportHeight = 0)
     {
         if (!SelectedRow.HasValue || viewportHeight <= 0) return;
-        if (SelectedRow.Value < Offset) Offset = SelectedRow.Value;
+        // Removed upward pinning to allow scroll while first row selected
+        // if (SelectedRow.Value < Offset) Offset = SelectedRow.Value;
         else if (SelectedRow.Value >= Offset + viewportHeight) Offset = SelectedRow.Value - viewportHeight + 1;
     }
 }

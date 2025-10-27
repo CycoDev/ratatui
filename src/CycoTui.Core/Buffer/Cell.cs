@@ -12,7 +12,7 @@ public readonly struct Cell : IEquatable<Cell>
 {
     /// <summary>Grapheme cluster stored for this cell (primary or continuation).</summary>
     public string Grapheme { get; }
-    public Style Style { get; }
+    public StyleType Style { get; }
 
     /// <summary>
     /// Construct a cell. Control characters are replaced by a single space; null/empty becomes space.
@@ -22,7 +22,7 @@ public readonly struct Cell : IEquatable<Cell>
     /// <summary>If true, this cell is a continuation part of a multi-width grapheme and should be skipped during direct rendering.</summary>
     public bool Skip { get; }
 
-    public Cell(string symbol, Style style, byte width = 1, bool skip = false)
+    public Cell(string symbol, StyleType style, byte width = 1, bool skip = false)
     {
         if (string.IsNullOrEmpty(symbol))
             Grapheme = " ";
@@ -35,7 +35,7 @@ public readonly struct Cell : IEquatable<Cell>
         Skip = skip;
     }
 
-    public static Cell Empty => new(" ", Style.Empty, 1, false);
+    public static Cell Empty => new(" ", StyleType.Empty, 1, false);
 
     /// <summary>
     /// Return a new cell with updated symbol (validation rules apply).
@@ -45,7 +45,7 @@ public readonly struct Cell : IEquatable<Cell>
     /// <summary>
     /// Return a new cell with updated style.
     /// </summary>
-    public Cell WithStyle(Style style) => new(Grapheme, style, Width, Skip);
+    public Cell WithStyle(StyleType style) => new(Grapheme, style, Width, Skip);
 
     public Cell AsContinuation() => new(Grapheme, Style, Width, true);
 

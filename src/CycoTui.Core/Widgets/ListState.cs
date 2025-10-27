@@ -18,7 +18,8 @@ public sealed class ListState
     {
         if (index.HasValue && (index < 0 || index >= Count)) return;
         Selected = index;
-        EnsureSelectedVisible();
+        // Heuristic default viewport guess (5) for visibility when not provided.
+        EnsureSelectedVisible(viewportHeight:5); // TODO: remove hard-coded guess; require explicit viewport
     }
 
     public void Next()

@@ -1,7 +1,7 @@
 ---
 id: CORE-M2-001
 title: Core Buffer and Rendering
-status: planned
+status: in-progress
 date: 2023-11-28
 ---
 

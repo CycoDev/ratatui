@@ -13,8 +13,8 @@ public sealed class ScrollbarWidget : IWidget
     public int ContentLength { get; init; } = 0;
     public int ViewportLength { get; init; } = 0;
     public int Offset { get; init; } = 0;
-    public Style BarStyle { get; init; } = Style.Empty.Add(TextModifier.Invert);
-    public Style TrackStyle { get; init; } = Style.Empty;
+    public StyleType BarStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
+    public StyleType TrackStyle { get; init; } = StyleType.Empty;
     public char TrackChar { get; init; } = '░';
     public char BarChar { get; init; } = '█';
 

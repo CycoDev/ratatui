@@ -15,9 +15,9 @@ public class TableWidgetTests
     public void TableRendersHeadersAndRows()
     {
         var backend = new TestBackend();
-        var term = new Terminal(backend, new LoggingContext(null));
-        var columns = new[]{ new TableColumn("H1", Constraint.Fill(), Style.Empty), new TableColumn("H2", Constraint.Fill(), Style.Empty) };
-        var rows = new[]{ new TableRow(new[]{ ("R1C1", Style.Empty), ("R1C2", Style.Empty)}) };
+        var term = new TerminalType(backend, new LoggingContext(null));
+        var columns = new[]{ new TableColumn("H1", Constraint.Fill(), StyleType.Empty), new TableColumn("H2", Constraint.Fill(), StyleType.Empty) };
+        var rows = new[]{ new TableRow(new[]{ ("R1C1", StyleType.Empty), ("R1C2", StyleType.Empty)}) };
         var table = TableWidget.Create().WithColumns(columns).WithRows(rows);
         term.Draw(f => table.Render(f, new Rect(0,0,20,5)));
         Assert.True(backend.Emitted.Any(c => c.Y == 0)); // header line

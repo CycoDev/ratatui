@@ -13,8 +13,8 @@ namespace CycoTui.Core.Widgets;
 public sealed class ListWidget : IStatefulWidget<ListState>
 {
     public IReadOnlyList<ListItem> Items { get; init; } = Array.Empty<ListItem>();
-    public Style SelectedStyle { get; init; } = Style.Empty.Add(TextModifier.Invert);
-    public Style ItemStyle { get; init; } = Style.Empty;
+    public StyleType SelectedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
+    public StyleType ItemStyle { get; init; } = StyleType.Empty;
     public bool WrapItems { get; init; } = false; // if true, item text wraps line width
 
     private ListWidget() { }
@@ -29,7 +29,7 @@ public sealed class ListWidget : IStatefulWidget<ListState>
         WrapItems = WrapItems
     };
 
-    public ListWidget WithSelectedStyle(Style style) => new()
+    public ListWidget WithSelectedStyle(StyleType style) => new()
     {
         Items = Items,
         SelectedStyle = style,
@@ -37,7 +37,7 @@ public sealed class ListWidget : IStatefulWidget<ListState>
         WrapItems = WrapItems
     };
 
-    public ListWidget WithItemStyle(Style style) => new()
+    public ListWidget WithItemStyle(StyleType style) => new()
     {
         Items = Items,
         SelectedStyle = SelectedStyle,
@@ -67,7 +67,7 @@ public sealed class ListWidget : IStatefulWidget<ListState>
         }
     }
 
-    private void RenderItem(Frame frame, Rect area, int lineIndex, ListItem item, Style style)
+    private void RenderItem(Frame frame, Rect area, int lineIndex, ListItem item, StyleType style)
     {
         var text = item.Text ?? string.Empty;
         int x = area.X;
