@@ -1,0 +1,571 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CycoTui.Core</name>
+    </assembly>
+    <members>
+        <member name="T:CycoTui.Core.Backend.BackendCapabilities">
+            <summary>
+            Immutable snapshot of backend feature capabilities. Used by higher layers to decide
+            whether to emit certain sequences (e.g., underline color) or fall back gracefully.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.BackendFactory">
+            <summary>
+            Factory responsible for creating terminal backend instances with fallback logic.
+            Supports registration of additional backend providers without modifying core code.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.BackendFactory.Register(CycoTui.Core.Backend.BackendPreference,System.Func{Microsoft.Extensions.Logging.ILogger,CycoTui.Core.Backend.ITerminalBackend})">
+            <summary>
+            Registers or replaces a backend creation delegate for a preference key.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.CellData">
+            <summary>
+            Simplified placeholder for cell data used during backend scaffolding.
+            Will be replaced by full Cell type with style, width, grapheme data in Core phase.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.CellUpdate">
+            <summary>
+            Represents a single cell update instruction. Transitional until full buffer model lands.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.ClearType">
+            <summary>
+            Indicates which region should be cleared when invoking <see cref="M:CycoTui.Core.Backend.ITerminalBackend.Clear(CycoTui.Core.Backend.ClearType)"/>.
+            </summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ClearType.All">
+            <summary>Entire screen.</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ClearType.AfterCursor">
+            <summary>All content after (below/right of) cursor.</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ClearType.BeforeCursor">
+            <summary>All content before (above/left of) cursor.</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ClearType.CurrentLine">
+            <summary>The current line.</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ClearType.UntilNewLine">
+            <summary>From cursor position to end of line.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.ColorLevel">
+            <summary>
+            Enumerates color depth support levels detected for a backend.
+            </summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ColorLevel.None">
+            <summary>No color support detected.</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ColorLevel.Ansi16">
+            <summary>Standard ANSI 16 colors (basic + bright).</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ColorLevel.Ansi256">
+            <summary>ANSI 256 color palette (indexed).</summary>
+        </member>
+        <member name="F:CycoTui.Core.Backend.ColorLevel.TrueColor">
+            <summary>24-bit true color (RGB) support.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.ITerminalBackend">
+            <summary>
+            Abstraction for low-level terminal operations. Implementations are not thread-safe
+            and expected to be confined to a single UI thread. Optional operations (scrolling,
+            append lines) MUST perform a no-op if the capability is not supported; they MUST NOT throw.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.Draw(System.Collections.Generic.IEnumerable{CycoTui.Core.Backend.CellUpdate})">
+            <summary>
+            Draw a sequence of cell updates. Each update represents a single absolute cell to be written.
+            Implementations should batch writes and minimize cursor movement.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.WriteRaw(System.String)">
+            <summary>Write a raw ANSI/terminal sequence directly (style changes, cursor moves, etc.).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.Flush">
+            <summary>Flush any buffered output to the terminal device.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.HideCursor">
+            <summary>Hide the cursor (no-op if unsupported).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.ShowCursor">
+            <summary>Show the cursor (no-op if unsupported).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.GetCursorPosition">
+            <summary>Get current cursor position (best effort; may return (0,0) if unknown).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.SetCursorPosition(CycoTui.Core.Backend.Position)">
+            <summary>Set cursor position (clamped silently if outside bounds).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.Clear(CycoTui.Core.Backend.ClearType)">
+            <summary>Clear content based on <paramref name="type"/>.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.AppendLines(System.Int32)">
+            <summary>Append <paramref name="count"/> new lines below the cursor if supported; otherwise no-op.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.GetSize">
+            <summary>Get current terminal character size (columns x rows).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.GetWindowSize">
+            <summary>Get window size including pixel metrics if available (Pixels may be (0,0)).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.ScrollRegionUp(System.Range,System.Int32)">
+            <summary>Scroll a region up by <paramref name="lineCount"/> lines (no-op if unsupported).</summary>
+        </member>
+        <member name="M:CycoTui.Core.Backend.ITerminalBackend.ScrollRegionDown(System.Range,System.Int32)">
+            <summary>Scroll a region down by <paramref name="lineCount"/> lines (no-op if unsupported).</summary>
+        </member>
+        <member name="P:CycoTui.Core.Backend.ITerminalBackend.Capabilities">
+            <summary>Backend capability snapshot populated at initialization.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.Position">
+            <summary>
+            Represents an absolute terminal coordinate (0-based, origin at top-left).
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.Size">
+            <summary>
+            Represents a width/height in character cells (non-negative logical units).
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.TestBackend">
+            <summary>
+            Deterministic test backend capturing emitted cell updates and tracking resets.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Backend.WindowSize">
+            <summary>
+            Represents both character and pixel dimensions of the terminal window.
+            Pixels may be (0,0) when not available.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Buffer.Buffer">
+            <summary>
+            Represents a 2D terminal drawing surface for a frame. Stores Cells in a flat array indexed by X/Y.
+            Supports grapheme-aware insertion (SetString) including multi-width (emoji/CJK) handling via skip flags.
+            </summary>
+            <remarks>
+            Buffer is reused across frames; Clear() resets all cells to Empty without reallocating.
+            Skip cells mark continuation parts of wide graphemes to avoid redundant emission on diff.
+            </remarks>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.#ctor(CycoTui.Core.Backend.Position,CycoTui.Core.Backend.Size)">
+            <summary>
+            Create a buffer with specified origin and size. All cells initialized to <see cref="P:CycoTui.Core.Buffer.Cell.Empty"/>.
+            </summary>
+            <param name="origin">Top-left coordinate of buffer area.</param>
+            <param name="size">Dimensions (width x height). Negative values coerced to zero.</param>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.Empty(CycoTui.Core.Backend.Size)">
+            <summary>
+            Create an empty buffer at origin (0,0).
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.Clear">
+            <summary>Clear all cells to <see cref="P:CycoTui.Core.Buffer.Cell.Empty"/> without reallocating.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.IndexOf(System.Int32,System.Int32)">
+            <summary>
+            Returns a 0-based flattened index for coordinates. Throws with descriptive details if out of bounds.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.GetCell(System.Int32,System.Int32)">
+            <summary>
+            Retrieve cell at absolute coordinates. Throws if outside bounds.
+            </summary>
+            <param name="x">Column (0-based).</param>
+            <param name="y">Row (0-based).</param>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.TryGetCell(System.Int32,System.Int32,CycoTui.Core.Buffer.Cell@)">
+            <summary>
+            Attempt to get a cell without throwing, returning false if out of bounds.
+            </summary>
+            <param name="x">Column (0-based).</param>
+            <param name="y">Row (0-based).</param>
+            <param name="cell">Result cell when true, or <see cref="P:CycoTui.Core.Buffer.Cell.Empty"/> when false.</param>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.SetCell(System.Int32,System.Int32,CycoTui.Core.Buffer.Cell)">
+            <summary>
+            Set a cell value at coordinates, overwriting previous content.
+            </summary>
+            <param name="x">Column (0-based).</param>
+            <param name="y">Row (0-based).</param>
+            <param name="cell">Cell to store.</param>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Buffer.SetString(System.Int32,System.Int32,System.String,CycoTui.Core.Style.Style)">
+            <summary>
+            Write a string starting at (x,y) truncating at buffer width.
+            Grapheme-aware: multi-width graphemes consume multiple cells with continuation cells flagged Skip.
+            </summary>
+            <param name="x">Column (0-based).</param>
+            <param name="y">Row (0-based).</param>
+            <param name="text">Text to write; null ignored.</param>
+            <param name="style">Style applied to each grapheme.</param>
+        </member>
+        <member name="T:CycoTui.Core.Buffer.BufferDiff">
+            <summary>
+            Provides diffing between two buffers producing per-cell updates or contiguous horizontal segments.
+            Phase-1: simple equality comparison (Symbol + Style). Multi-width invalidation to be added later.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.BufferDiff.EnumerateCellDiff(CycoTui.Core.Buffer.Buffer,CycoTui.Core.Buffer.Buffer)">
+            <summary>
+            Enumerate changed cells between <paramref name="previous"/> and <paramref name="current"/>.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.BufferDiff.EnumerateSegments(CycoTui.Core.Buffer.Buffer,CycoTui.Core.Buffer.Buffer)">
+            <summary>
+            Enumerate changed segments (contiguous horizontal runs) between two buffers.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Buffer.ChangedCell">
+            <summary>
+            Represents a changed cell.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Buffer.DiffSegment">
+            <summary>
+            Represents a contiguous horizontal run of changed cells on a single row.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Buffer.Cell">
+            <summary>
+            <summary>
+            A single cell within a Buffer. Stores a grapheme cluster, cached column width, style, and Skip flag indicating continuation of a multi-width grapheme.
+            </summary>
+            </summary>
+        </member>
+        <member name="P:CycoTui.Core.Buffer.Cell.Grapheme">
+            <summary>Grapheme cluster stored for this cell (primary or continuation).</summary>
+        </member>
+        <member name="P:CycoTui.Core.Buffer.Cell.Width">
+            <summary>
+            Construct a cell. Control characters are replaced by a single space; null/empty becomes space.
+            </summary>
+            <summary>Display width in columns (1 or 2 typically).</summary>
+        </member>
+        <member name="P:CycoTui.Core.Buffer.Cell.Skip">
+            <summary>If true, this cell is a continuation part of a multi-width grapheme and should be skipped during direct rendering.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Cell.WithSymbol(System.String)">
+            <summary>
+            Return a new cell with updated symbol (validation rules apply).
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Buffer.Cell.WithStyle(CycoTui.Core.Style.Style)">
+            <summary>
+            Return a new cell with updated style.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Features.FeatureFlags">
+            <summary>
+            Runtime feature flag snapshot. Build-time exclusion still relies on conditional compilation.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.AlignmentMode">
+            <summary>
+            Alignment/distribution mode controlling placement and spacing of segments within available free space.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.Constraint">
+            <summary>
+            Represents a layout constraint influencing size calculation for a segment.
+            </summary>
+            <remarks>
+            Precedence order in distribution: Length -> Min -> Percentage -> Ratio -> Fill -> Max enforcement.
+            Ratio uses Value/Denominator as weight.
+            </remarks>
+        </member>
+        <member name="T:CycoTui.Core.Layout.ConstraintKind">
+            <summary>
+            Enumerates supported layout constraint kinds used in distributing space.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.LayoutDirection">
+            <summary>
+            Direction of layout distribution.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.LayoutEngine">
+            <summary>
+            Distributes space among constraints, producing child rectangles horizontally or vertically.
+            </summary>
+            <remarks>
+            Precedence order: Length -> Min -> Percentage -> Ratio -> Fill -> Max enforcement.
+            Overflow policy: proportional shrink of Min first, then Length if needed.
+            Alignment applied after sizing.
+            </remarks>
+        </member>
+        <member name="M:CycoTui.Core.Layout.LayoutEngine.Distribute(CycoTui.Core.Layout.Rect,System.Collections.Generic.IReadOnlyList{CycoTui.Core.Layout.Constraint},CycoTui.Core.Layout.LayoutDirection,System.Nullable{CycoTui.Core.Layout.Margin},System.Nullable{CycoTui.Core.Layout.Padding},CycoTui.Core.Layout.AlignmentMode)">
+            <summary>
+            Distribute the <paramref name="area"/> among the given <paramref name="constraints"/>.
+            Applies margin/padding if provided. Returns list of child rects in order.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.Margin">
+            <summary>
+            Represents outer spacing around a rectangle.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.Padding">
+            <summary>
+            Represents inner spacing inside a rectangle.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Layout.Rect">
+            <summary>
+            Represents an axis-aligned rectangle using top-left origin and width/height.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Logging.LoggingContext">
+            <summary>
+            Central logging context to acquire typed loggers.
+            Acquire a logger once per component and cache it; avoid calling per-frame in hot paths.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Style.Color">
+            <summary>
+            <summary>
+            Terminal color abstraction covering ANSI named (basic indices), 256-color indexed, and 24-bit RGB.
+            Use factory methods (AnsiIndex, Indexed, Rgb). Reset indicates terminal default color.
+            </summary>
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Style.MergeStrategy">
+            <summary>
+            Strategy for resolving symbol overlap when drawing layered borders or glyphs.
+            </summary>
+            <remarks>
+            Replace overwrites existing glyph; Preserve keeps existing non-space glyph. Combine reserved for future.
+            </remarks>
+        </member>
+        <member name="T:CycoTui.Core.Style.ModifierCodes">
+            <summary>
+            Provides ANSI codes for setting and resetting text modifiers.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Style.Style">
+            <summary>
+            Immutable style descriptor combining optional foreground/background/underline colors and modifier add/remove masks.
+            Styles are patched (non-null colors override; modifier masks OR'd) rather than replaced.
+            Underline color emission depends on backend capability or may degrade to foreground.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Style.StyleDiff">
+            <summary>
+            Computes difference between two modifier sets.
+            Phase-1: simple added/removed calculation.
+            Intensity (Bold/Dim) normalization: if either Bold or Dim changes, reset both then apply new set to avoid conflicting states.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Style.StyleEmitter">
+            <summary>Converts style transitions into ANSI escape sequences.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Style.StyleEmitter.Emit(CycoTui.Core.Style.Style,CycoTui.Core.Style.Style,System.Boolean,System.Boolean)">
+            <summary>Emit ANSI sequences representing transition from one style to another.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Style.TextModifier">
+            <summary>
+            Bit flags representing text styling modifiers. These correspond to terminal
+            attributes where supported. Some combinations (Bold + Dim) are mutually exclusive
+            and will be normalized by the style diff logic in later phases.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Terminal.Frame">
+            <summary>
+            Represents a rendering frame for a single Draw cycle, exposing write helpers into the underlying buffer.
+            </summary>
+        </member>
+        <member name="P:CycoTui.Core.Terminal.Frame.Buffer">
+            <summary>The underlying mutable buffer for this frame.</summary>
+        </member>
+        <member name="M:CycoTui.Core.Terminal.Frame.WriteString(System.Int32,System.Int32,System.String,CycoTui.Core.Style.Style)">
+            <summary>
+            Write a string at (x,y) using the provided style. Grapheme clusters are measured and may span multiple cells.
+            </summary>
+            <param name="x">Column (0-based).</param>
+            <param name="y">Row (0-based).</param>
+            <param name="text">Text to write (null safe; ignored if null).</param>
+            <param name="style">Style applied to each grapheme.</param>
+        </member>
+        <member name="M:CycoTui.Core.Terminal.Frame.SetCell(System.Int32,System.Int32,System.String,CycoTui.Core.Style.Style)">
+            <summary>
+            Set a single grapheme at (x,y). Caller must ensure area bounds.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Terminal.Terminal">
+            <summary>
+            Provides the high-level drawing API for CycoTui.
+            Manages double-buffered rendering (previous/current) against an ITerminalBackend, performs diffing
+            and optimized style transitions, and emits a style reset only when styles changed.
+            Thread confinement: not thread-safe; callers must serialize Draw invocations.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Terminal.Terminal.#ctor(CycoTui.Core.Backend.ITerminalBackend,CycoTui.Core.Logging.LoggingContext)">
+            <summary>
+            Create a new terminal with the specified backend and logging context.
+            </summary>
+            <param name="backend">Backend implementing terminal operations.</param>
+            <param name="logging">Logging context (null-safe; provides logger factory).</param>
+        </member>
+        <member name="M:CycoTui.Core.Terminal.Terminal.Draw(System.Action{CycoTui.Core.Terminal.Frame})">
+            <summary>
+            Perform a draw cycle: ensure buffer size, create frame, invoke <paramref name="render"/>, diff, emit changes.
+            </summary>
+            <param name="render">User rendering callback populating the frame.</param>
+        </member>
+        <member name="M:CycoTui.Core.Terminal.Terminal.Dispose">
+            <summary>Dispose backend and release resources. Safe to call multiple times.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Text.GraphemeEnumerator">
+            <summary>
+            Enumerates grapheme clusters in a string. Phase-1 implementation uses <see cref="T:System.Globalization.StringInfo"/>.
+            TODO: Extend for full emoji ZWJ sequence handling and custom segmentation adjustments.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Text.GraphemeEnumerator.Enumerate(System.String)">
+            <summary>
+            Enumerate graphemes in <paramref name="text"/>. Returns each text element substring.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Text.GraphemeEnumerator.EnumerateWithZwj(System.String)">
+            <summary>
+            Enumerate graphemes with rudimentary ZWJ (zero width joiner) chaining: emoji sequences separated by U+200D
+            are merged into a single grapheme string.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Text.MaskedText">
+            <summary>
+            Represents text whose visual representation is masked but original content retained.
+            Phase-2 simple implementation; does not secure memory.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Text.UnicodeWidthProvider">
+            <summary>
+            Computes display width (columns) for grapheme clusters. Phase-1 uses simplified tables.
+            TODO: Expand with full Unicode East Asian Width data + emoji sequences.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Text.UnicodeWidthProvider.GetWidth(System.String)">
+            <summary>
+            Get width for a grapheme cluster. If cluster length &gt; 1, treat width as max of constituent scalars
+            (placeholder). Combining marks yield width 0.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Text.WidthMode">
+            <summary>
+            Mode controlling treatment of ambiguous-width characters.
+            Standard: ambiguous treated as width 1.
+            EastAsian: ambiguous treated as width 2.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Text.WidthService">
+            <summary>
+            Global access point for width calculations. Mode can be set prior to rendering loop.
+            Changing mode mid-frame is undefined (documented behavior).
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Text.WidthService.GetWidth(System.String)">
+            <summary>Get width of a grapheme using current <see cref="P:CycoTui.Core.Text.WidthService.Mode"/>.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.Block">
+            <summary>
+            Renders a bordered container with optional title. Serves as a foundational container widget.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.BlockBorderStyle">
+            <summary>
+            Defines border characters for the Block widget.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.GaugeWidget">
+            <summary>
+            Horizontal progress bar (gauge) widget showing completion ratio with configurable characters and styles.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.IStatefulWidget`1">
+            <summary>
+            Stateful widget interface allowing a render with external state object.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Widgets.IStatefulWidget`1.Render(CycoTui.Core.Terminal.Frame,CycoTui.Core.Layout.Rect,`0)">
+            <summary>Render widget with state inside <paramref name="area"/>.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.IWidget">
+            <summary>
+            Stateless widget interface. Implementations render into a frame within the provided area.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Widgets.IWidget.Render(CycoTui.Core.Terminal.Frame,CycoTui.Core.Layout.Rect)">
+            <summary>Render widget content inside <paramref name="area"/>.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.ListItem">
+            <summary>
+            Represents a single list item (text + style).
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.ListState">
+            <summary>
+            State for ListWidget including selected index and vertical scroll offset.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.ListWidget">
+            <summary>
+            Vertical list widget supporting selection highlighting, optional item wrapping, and scrolling via ListState.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.Paragraph">
+            <summary>
+            Multi-line text widget supporting grapheme-aware wrapping, horizontal alignment, and max line limiting.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.ParagraphAlignment">
+            <summary>
+            Horizontal alignment for paragraph lines.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.ScrollbarOrientation">
+            <summary>
+            Orientation for scrollbar widget.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.ScrollbarWidget">
+            <summary>
+            Scrollbar widget visualizing scroll state given content size, viewport size, and current offset.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.TableColumn">
+            <summary>
+            Column specification for Table widget.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.TableRow">
+            <summary>
+            Represents a row in the Table widget.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.TableState">
+            <summary>
+            State for TableWidget tracking selected row and vertical scroll offset.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.TableWidget">
+            <summary>
+            Table widget with column constraint distribution, header row, and vertically scrollable body via TableState.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.TableWidgetStatefulExtensions">
+            <summary>
+            Stateful table rendering extension.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.TabsWidget">
+            <summary>
+            Tabs widget rendering a horizontal set of labels with alignment and selected tab styling.
+            </summary>
+        </member>
+    </members>
+</doc>

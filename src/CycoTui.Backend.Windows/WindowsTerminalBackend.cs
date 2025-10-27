@@ -1,4 +1,6 @@
 using System;
+// TODO: Capability probing (underline color, scrolling regions, true color); buffering optimization
+
 using System.Collections.Generic;
 using CycoTui.Core.Backend;
 using CycoTui.Core.Style;
@@ -15,8 +17,8 @@ public sealed class WindowsTerminalBackend : ITerminalBackend
 
     public WindowsTerminalBackend()
     {
-        Capabilities = BackendCapabilities.Minimal with { SupportsUnderlineColor = false };
-        Console.TreatControlCharactersAsLiteral = false;
+        Capabilities = BackendCapabilities.Minimal;
+
     }
 
     public void Draw(IEnumerable<CellUpdate> updates)
@@ -25,7 +27,7 @@ public sealed class WindowsTerminalBackend : ITerminalBackend
         {
             if (u.X < 0 || u.Y < 0) continue; // style-only placeholder not used here
             TrySetCursor(u.X, u.Y);
-            Console.Write(u.Cell.Symbol);
+            Console.Write(u.Cell.Grapheme);
         }
     }
 

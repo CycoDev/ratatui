@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CycoTui.Backend.Unix</name>
+    </assembly>
+    <members>
+        <member name="T:CycoTui.Backend.Unix.UnixTerminalBackend">
+            <summary>
+            Minimal ANSI/Unix backend. Phase-1 implementation writing raw ANSI directly.
+            </summary>
+        </member>
+    </members>
+</doc>

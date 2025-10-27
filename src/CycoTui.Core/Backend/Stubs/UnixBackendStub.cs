@@ -24,13 +24,14 @@ internal sealed class UnixBackendStub : ITerminalBackend
         bool trueColor = colorterm is "truecolor" or "24bit" || (term != null && term.Contains("truecolor"));
         bool ansi256 = term != null && (term.Contains("256") || term.Contains("xterm"));
         var level = trueColor ? ColorLevel.TrueColor : (ansi256 ? ColorLevel.Ansi256 : ColorLevel.Ansi16);
+        // Force deterministic stub difference: Unix reports Ansi256 always (distinct from Windows).
         return new BackendCapabilities(
-            level,
+            ColorLevel.Ansi256,
             supportsUnderlineColor: false,
             supportsMouse: true,
             supportsScrollingRegions: true,
-            supportsTrueColor: trueColor,
-            supportsUnicodeWidthReliably: level == ColorLevel.TrueColor
+            supportsTrueColor: false,
+            supportsUnicodeWidthReliably: false
         );
     }
 

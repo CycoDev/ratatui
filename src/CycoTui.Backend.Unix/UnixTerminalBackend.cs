@@ -1,4 +1,6 @@
 using System;
+// TODO: Capability probing (underline color, scrolling regions, mouse); buffering optimization
+
 using System.Collections.Generic;
 using CycoTui.Core.Backend;
 using CycoTui.Core.Style;
@@ -15,7 +17,7 @@ public sealed class UnixTerminalBackend : ITerminalBackend
 
     public UnixTerminalBackend()
     {
-        Capabilities = BackendCapabilities.Minimal with { SupportsUnderlineColor = false };
+        Capabilities = BackendCapabilities.Minimal;
         // Phase-1: capability probing omitted.
     }
 
@@ -25,7 +27,7 @@ public sealed class UnixTerminalBackend : ITerminalBackend
         {
             if (u.X < 0 || u.Y < 0) continue;
             WriteRaw($"\u001b[{u.Y + 1};{u.X + 1}H"); // ANSI cursor move is 1-based
-            Console.Write(u.Cell.Symbol);
+            Console.Write(u.Cell.Grapheme);
         }
     }
 

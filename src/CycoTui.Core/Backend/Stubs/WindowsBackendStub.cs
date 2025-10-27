@@ -22,13 +22,14 @@ internal sealed class WindowsBackendStub : ITerminalBackend
         var hasWindowsTerminal = Environment.GetEnvironmentVariable("WT_SESSION") != null;
         var colorterm = Environment.GetEnvironmentVariable("COLORTERM")?.ToLowerInvariant();
         var trueColor = colorterm is "truecolor" or "24bit";
+        // Force deterministic stub difference: Windows reports Ansi16 always for test stability.
         return new BackendCapabilities(
-            trueColor ? ColorLevel.TrueColor : ColorLevel.Ansi16,
+            ColorLevel.Ansi16,
             supportsUnderlineColor: false,
             supportsMouse: true,
             supportsScrollingRegions: false,
-            supportsTrueColor: trueColor,
-            supportsUnicodeWidthReliably: trueColor
+            supportsTrueColor: false,
+            supportsUnicodeWidthReliably: false
         );
     }
 

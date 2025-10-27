@@ -4,12 +4,16 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
     <RootNamespace>CycoTui.Core.Tests</RootNamespace>
+    <NoWarn>$(NoWarn);CS1591;CS8633;xUnit2012</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/CycoTui.Core/CycoTui.Core.csproj" />
+    <ProjectReference Include="../../src/CycoTui.Backend.Unix/CycoTui.Backend.Unix.csproj" />
+    <ProjectReference Include="../../src/CycoTui.Backend.Windows/CycoTui.Backend.Windows.csproj" />
     <PackageReference Include="xunit" Version="2.6.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.10" />
   </ItemGroup>
 </Project>

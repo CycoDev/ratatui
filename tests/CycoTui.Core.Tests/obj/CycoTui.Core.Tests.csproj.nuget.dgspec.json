@@ -1,0 +1,441 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/CycoTui.Core.Tests.csproj": {}
+  },
+  "projects": {
+    "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Unix/CycoTui.Backend.Unix.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Unix/CycoTui.Backend.Unix.csproj",
+        "projectName": "CycoTui.Backend.Unix",
+        "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Unix/CycoTui.Backend.Unix.csproj",
+        "packagesPath": "/Users/phs/.nuget/packages/",
+        "outputPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Unix/obj/",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "configFilePaths": [
+          "/Users/phs/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0",
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj"
+              }
+            }
+          },
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        },
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/CycoTui.Backend.Windows.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/CycoTui.Backend.Windows.csproj",
+        "projectName": "CycoTui.Backend.Windows",
+        "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/CycoTui.Backend.Windows.csproj",
+        "packagesPath": "/Users/phs/.nuget/packages/",
+        "outputPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "configFilePaths": [
+          "/Users/phs/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0",
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj"
+              }
+            }
+          },
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        },
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj",
+        "projectName": "CycoTui.Core",
+        "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj",
+        "packagesPath": "/Users/phs/.nuget/packages/",
+        "outputPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/",
+        "projectStyle": "PackageReference",
+        "crossTargeting": true,
+        "configFilePaths": [
+          "/Users/phs/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0",
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          },
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "allWarningsAsErrors": true,
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        },
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/CycoTui.Core.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/CycoTui.Core.Tests.csproj",
+        "projectName": "CycoTui.Core.Tests",
+        "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/CycoTui.Core.Tests.csproj",
+        "packagesPath": "/Users/phs/.nuget/packages/",
+        "outputPath": "/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/phs/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Unix/CycoTui.Backend.Unix.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Unix/CycoTui.Backend.Unix.csproj"
+              },
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/CycoTui.Backend.Windows.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/CycoTui.Backend.Windows.csproj"
+              },
+              "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj": {
+                "projectPath": "/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/CycoTui.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.Logging": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[17.9.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.6.6, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.5.6, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

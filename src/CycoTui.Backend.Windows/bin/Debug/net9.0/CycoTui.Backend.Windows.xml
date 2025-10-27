@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CycoTui.Backend.Windows</name>
+    </assembly>
+    <members>
+        <member name="T:CycoTui.Backend.Windows.WindowsTerminalBackend">
+            <summary>
+            Minimal Windows console backend implementation. Phase-1: basic raw write, size, cursor show/hide.
+            </summary>
+        </member>
+    </members>
+</doc>
