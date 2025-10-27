@@ -12,12 +12,19 @@ namespace CycoTui.Backend.Unix;
 /// </summary>
 public sealed class UnixTerminalBackend : ITerminalBackend
 {
+    private BackendCapabilities ProbeCapabilities()
+    {
+        var colorterm = Environment.GetEnvironmentVariable("COLORTERM") ?? string.Empty;
+        var trueColor = colorterm.Contains("truecolor", StringComparison.OrdinalIgnoreCase);
+        var level = trueColor ? ColorLevel.TrueColor : ColorLevel.Ansi256;
+        return new BackendCapabilities(level, supportsUnderlineColor: false, supportsMouse: true, supportsScrollingRegions: true, supportsTrueColor: trueColor, supportsUnicodeWidthReliably: false);
+    }
     private bool _disposed;
     public BackendCapabilities Capabilities { get; }
 
     public UnixTerminalBackend()
     {
-        Capabilities = BackendCapabilities.Minimal;
+        Capabilities = ProbeCapabilities();
         // Phase-1: capability probing omitted.
     }
 

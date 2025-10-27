@@ -20,7 +20,7 @@ public class TableWidgetScrollTests
         var rows = Enumerable.Range(0, 10).Select(i => new TableRow(new[]{ ($"Row{i}", StyleType.Empty) })).ToArray();
         var table = TableWidget.Create().WithColumns(columns).WithRows(rows);
         var state = new TableState(rowCount: rows.Length);
-        state.Select(0);
+        state.Select(0, viewportHeight:4);
 
         // initial
         term.Draw(f => table.Render(f, new Rect(0,0,10,5), state));

@@ -18,7 +18,7 @@ public class ListWidgetTests
         var term = new TerminalType(backend, new LoggingContext(null));
         var items = new[]{ new ListItem("One", StyleType.Empty), new ListItem("Two", StyleType.Empty) };
         var state = new ListState();
-        state.Select(1);
+        state.Select(1, viewportHeight:5);
         var list = ListWidget.Create().WithItems(items);
         term.Draw(f => list.Render(f, new Rect(0,0,10,5), state));
         Assert.True(backend.Emitted.Any(c => c.X == 0 && c.Y == 1)); // second item line

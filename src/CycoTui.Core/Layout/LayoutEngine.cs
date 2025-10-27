@@ -264,19 +264,25 @@ public sealed class LayoutEngine
                     int gaps = constraints.Count + 1;
                     int gap = freeSpace / gaps;
                     int extra = freeSpace % gaps;
-                    startOffset = gap + (extra > 0 ? 1 : 0);
+                    int cursor = area.X + gap + (extra > 0 ? 1 : 0);
+                    if (extra > 0) extra--;
+                    for (int i = 0; i < constraints.Count; i++)
+                    {
+                        int len = lengths[i];
+                        rects[i] = direction == LayoutDirection.Horizontal
+                            ? new Rect(cursor, area.Y, len, area.Height)
+                            : new Rect(area.X, cursor, area.Width, len);
+                        cursor += len;
+                        int addGap = gap + (extra > 0 ? 1 : 0);
+                        if (extra > 0) extra--;
+                        cursor += addGap;
+                    }
+                    return rects;
                 }
                 break;
         }
 
-        // Alignment post-fix for SpaceEvenly edge case where calculation produced zero despite free space.
-        if (alignment == AlignmentMode.SpaceEvenly && freeSpace > 0 && constraints.Count > 0)
-        {
-            int gaps = constraints.Count + 1;
-            int gap = freeSpace / gaps;
-            int extra = freeSpace % gaps;
-            startOffset = gap + (extra > 0 ? 1 : 0);
-        }
+
         int pos = direction == LayoutDirection.Horizontal ? area.X + startOffset : area.Y + startOffset;
         for (int i = 0; i < lengths.Length; i++)
         {
@@ -287,15 +293,7 @@ public sealed class LayoutEngine
             pos += len;
         }
 
-        // Post-adjustment for SpaceEvenly pathological zero-offset
-        if (alignment == AlignmentMode.SpaceEvenly && freeSpace > 0 && rects.Length > 0 && rects[0].X == area.X)
-        {
-            for (int i = 0; i < rects.Length; i++)
-            {
-                var r = rects[i];
-                rects[i] = new Rect(r.X + 1, r.Y, r.Width, r.Height);
-            }
-        }
+
         return rects;
     }
 }

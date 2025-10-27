@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CycoTui.Core.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8cbd87ef0b9db98b48124d799d91b59f5988b30b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+95f59f8e7e36208103394eeba7604a492cd3e6cd")]
 [assembly: System.Reflection.AssemblyProductAttribute("CycoTui.Core.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CycoTui.Core.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

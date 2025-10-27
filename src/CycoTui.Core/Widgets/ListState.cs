@@ -14,26 +14,25 @@ public sealed class ListState
         Count = count;
     }
 
-    public void Select(int? index)
+    public void Select(int? index, int viewportHeight)
     {
         if (index.HasValue && (index < 0 || index >= Count)) return;
         Selected = index;
-        // Heuristic default viewport guess (5) for visibility when not provided.
-        EnsureSelectedVisible(viewportHeight:5); // TODO: remove hard-coded guess; require explicit viewport
+        EnsureSelectedVisible(viewportHeight);
     }
 
-    public void Next()
+    public void Next(int viewportHeight)
     {
-        if (!Selected.HasValue) { if (Count > 0) Selected = 0; EnsureSelectedVisible(); return; }
+        if (!Selected.HasValue) { if (Count > 0) Selected = 0; EnsureSelectedVisible(viewportHeight); return; }
         if (Selected.Value + 1 < Count) Selected = Selected.Value + 1;
-        EnsureSelectedVisible();
+        EnsureSelectedVisible(viewportHeight);
     }
 
-    public void Previous()
+    public void Previous(int viewportHeight)
     {
-        if (!Selected.HasValue) { if (Count > 0) Selected = 0; EnsureSelectedVisible(); return; }
+        if (!Selected.HasValue) { if (Count > 0) Selected = 0; EnsureSelectedVisible(viewportHeight); return; }
         if (Selected.Value - 1 >= 0) Selected = Selected.Value - 1;
-        EnsureSelectedVisible();
+        EnsureSelectedVisible(viewportHeight);
     }
 
     public void ScrollDown(int viewportHeight)

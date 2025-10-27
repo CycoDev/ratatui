@@ -1,3 +1,4 @@
+using System.Linq;
 using Xunit;
 using CycoTui.Core.Widgets;
 using CycoTui.Core.Terminal;
@@ -23,7 +24,10 @@ public class BlockMergeStrategyTests
         term.Draw(f => {
             block2.Render(f, new Rect(0,0,6,3));
         });
-        // Expect fewer new emissions for overlapping border corners than full redraw would produce
-        Assert.True(backend.Emitted.Count < existingCount + 20); // heuristic check
+        // Precise check: corner glyph at (0,0) should not be duplicated when Preserve is used.
+        int cornerOccurrences = backend.Emitted.Where(c => c.X == 0 && c.Y == 0 && c.Cell.Grapheme == block1.Border.TopLeft).Count();
+        Assert.Equal(1, cornerOccurrences);
+        // Emission count should grow, but not by full border size again.
+        Assert.True(backend.Emitted.Count < existingCount + 10);
     }
 }

@@ -14,11 +14,11 @@ public sealed class TableState
         RowCount = rowCount;
     }
 
-    public void Select(int? row)
+    public void Select(int? row, int viewportHeight)
     {
         if (row.HasValue && (row < 0 || row >= RowCount)) return;
         SelectedRow = row;
-        EnsureVisible(viewportHeight:5); // TODO: remove hard-coded guess; require explicit viewport
+        EnsureVisible(viewportHeight);
     }
 
     public void Next(int viewportHeight)

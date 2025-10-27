@@ -3,7 +3,7 @@
 
 Generated: 2025-10-27
 
-Public Types Snapshot (Interim - TODO: replace with automated reflection output)
+Public Types Snapshot (Interim - reflection placeholder)
 
 Namespaces & Key Types:
 - CycoTui.Core.Backend: ITerminalBackend, BackendFactory, BackendPreference, BackendCapabilities, Size, Position, WindowSize
@@ -13,6 +13,11 @@ Namespaces & Key Types:
 - CycoTui.Core.Terminal: Terminal, Frame
 - CycoTui.Core.Text: GraphemeEnumerator, WidthService, UnicodeWidthProvider, MaskedText, WidthMode
 - CycoTui.Core.Widgets: Block, Paragraph, ScrollbarWidget, ListWidget, TableWidget, TabsWidget, GaugeWidget, ListState, TableState
+Reflection TODO:
+- Add automated generator to enumerate public methods & properties per type.
+- Include capability summary for backends (color level, underline support).
+- Include style batching stats once implemented.
+
 
 TODO:
 - Automate generation via reflection across all loaded assemblies.

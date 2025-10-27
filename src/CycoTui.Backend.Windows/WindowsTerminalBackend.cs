@@ -12,12 +12,18 @@ namespace CycoTui.Backend.Windows;
 /// </summary>
 public sealed class WindowsTerminalBackend : ITerminalBackend
 {
+    private BackendCapabilities ProbeCapabilities()
+    {
+        // Simple heuristic probing placeholder
+        // TODO: real probing (e.g., check WT_SESSION for Windows Terminal truecolor)
+        return BackendCapabilities.Minimal;
+    }
     private bool _disposed;
     public BackendCapabilities Capabilities { get; }
 
     public WindowsTerminalBackend()
     {
-        Capabilities = BackendCapabilities.Minimal;
+        Capabilities = ProbeCapabilities();
 
     }
 
