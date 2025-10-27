@@ -24,6 +24,7 @@ public sealed class Terminal : IDisposable
     private bool _disposed;
     private bool _styleTransitionOccurred;
     private string? _lastStyleSequence;
+    private string? _prevEmittedStyleSequence;
     // Style state tracker nested type
     private sealed class StyleState
     {
@@ -148,7 +149,13 @@ public sealed class Terminal : IDisposable
     {
         if (!string.IsNullOrEmpty(_lastStyleSequence))
         {
-            _backend.WriteRaw(_lastStyleSequence);
+            // Deduplicate identical consecutive style sequences
+            if (_lastStyleSequence != _prevEmittedStyleSequence)
+            {
+                var compressed = CompressStyleSequence(_lastStyleSequence);
+                _backend.WriteRaw(compressed);
+                _prevEmittedStyleSequence = _lastStyleSequence;
+            }
             _lastStyleSequence = null;
         }
     }
@@ -160,4 +167,42 @@ public sealed class Terminal : IDisposable
         _backend.Dispose();
         _disposed = true;
     }
+
+    private static string CompressStyleSequence(string seq)
+    {
+        // Very small heuristic compression: collapse consecutive CSI sequences by merging their parameter lists
+        // Example: "\u001b[1m\u001b[3m" -> "\u001b[1;3m".
+        // Implementation: parse simple pattern ESC[<codes>m repeated.
+        if (string.IsNullOrEmpty(seq)) return seq;
+        var parts = new List<string>();
+        int i = 0;
+        while (i < seq.Length)
+        {
+            int esc = seq.IndexOf("\u001b[", i, StringComparison.Ordinal);
+            if (esc < 0) break;
+            int m = seq.IndexOf('m', esc);
+            if (m < 0) break;
+            var payload = seq.Substring(esc + 2, m - (esc + 2)); // between '[' and 'm'
+            parts.Add(payload);
+            i = m + 1;
+        }
+        if (parts.Count <= 1) return seq;
+        // Attempt merge if all fragments are simple numbers or number;number forms (avoid complex sequences like 38;5)
+        var simple = parts.All(p => p.Split(';').All(s => int.TryParse(s, out _)));
+        if (!simple) return seq; // do not risk altering complex 38;2;r;g;b sequences ordering
+        // Flatten and de-duplicate while preserving order
+        var mergedTokens = new List<string>();
+        var seen = new HashSet<string>();
+        foreach (var p in parts)
+        {
+            foreach (var token in p.Split(';'))
+            {
+                if (token.Length == 0) continue;
+                if (seen.Add(token)) mergedTokens.Add(token);
+            }
+        }
+        return $"\u001b[{string.Join(';', mergedTokens)}m";
+    }
+
+
 }

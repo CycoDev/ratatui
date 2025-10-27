@@ -1,3 +1,4 @@
+using System.Linq;
 using CycoTui.Core.Backend;
 using CycoTui.Core.Logging;
 using CycoTui.Core.Style;
@@ -17,6 +18,6 @@ public class TestBackendRawSequenceTests
             f.WriteString(0,0,"A", StyleType.Empty.Add(TextModifier.Bold));
             f.WriteString(1,0,"B", StyleType.Empty.Add(TextModifier.Dim));
         });
-        Assert.Contains(backend.RawSequences, s => s.Contains("\u001b[22m")); // intensity reset
+        Assert.True(backend.RawSequences.Any(s => s.Contains("[22")), "Expected intensity reset (22) in consolidated sequence");
     }
 }
