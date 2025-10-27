@@ -23,6 +23,7 @@ public sealed class Terminal : IDisposable
     private BufferType _current;
     private bool _disposed;
     private bool _styleTransitionOccurred;
+    private string? _lastStyleSequence;
     // Style state tracker nested type
     private sealed class StyleState
     {
@@ -97,6 +98,7 @@ public sealed class Terminal : IDisposable
         foreach (var seg in segments)
         {
             EmitSegment(seg, styleState, cellUpdates);
+            FlushStyleBatch();
         }
 
         _backend.Draw(cellUpdates);
@@ -108,6 +110,8 @@ public sealed class Terminal : IDisposable
 
     private void EmitSegment(DiffSegment seg, StyleState styleState, List<CellUpdate> cellUpdates)
     {
+        // TODO: Style batching not yet implemented. Placeholder for future batching buffer.
+
         for (int i = 0; i < seg.Length; i++)
         {
             var cell = seg.Cells[i];
@@ -115,10 +119,9 @@ public sealed class Terminal : IDisposable
             var emittedStyleSeq = styleState.Apply(cell.Style);
             if (!string.IsNullOrEmpty(emittedStyleSeq))
             {
-                // Convert style sequences into artificial cell updates (placeholder until backend supports raw sequence emission)
-                // Using X/Y of -1 indicates style-only update; backend may interpret specially later.
                 _styleTransitionOccurred = true;
-                _backend.WriteRaw(emittedStyleSeq);
+                // Batch: only store latest sequence; emission deferred until segment boundary.
+                _lastStyleSequence = emittedStyleSeq;
             }
             // Emit cell symbol (full grapheme)
             cellUpdates.Add(new CellUpdate(seg.StartX + i, seg.Y, new CellData(cell.Grapheme)));
@@ -139,6 +142,15 @@ public sealed class Terminal : IDisposable
         _previous = _current;
         _current = tmp;
         _current.Clear(); // in-place reuse
+    }
+
+    private void FlushStyleBatch()
+    {
+        if (!string.IsNullOrEmpty(_lastStyleSequence))
+        {
+            _backend.WriteRaw(_lastStyleSequence);
+            _lastStyleSequence = null;
+        }
     }
 
     /// <summary>Dispose backend and release resources. Safe to call multiple times.</summary>
