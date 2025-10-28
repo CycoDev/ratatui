@@ -23,13 +23,24 @@ public static class EscapeSequenceParser
                 {
                     int start = i + 2;
                     int m = start;
-                    while (m < input.Length && !char.IsLetter(input[m])) m++;
+                    while (m < input.Length && !char.IsLetter(input[m]) && input[m] != '~' && input[m] != 'M' && input[m] != 'm') m++;
                     if (m < input.Length)
                     {
                         char final = input[m];
                         string paramsPart = input.Substring(start, m - start);
-                        var (code, modifiers) = MapCsi(final, paramsPart);
-                        yield return InputEvent.FromKey(new KeyEvent(code, null, modifiers));
+                        if (final == 'M' || final == 'm')
+                        {
+                            foreach (var mevt in ParseMouse(paramsPart, final)) yield return mevt;
+                        }
+                        else if (final == '~')
+                        {
+                            foreach (var evt in ParseTilde(paramsPart)) yield return evt;
+                        }
+                        else
+                        {
+                            var (code, modifiers) = MapCsi(final, paramsPart);
+                            yield return InputEvent.FromKey(new KeyEvent(code, null, modifiers));
+                        }
                         i = m + 1;
                         continue;
                     }
@@ -96,4 +107,50 @@ public static class EscapeSequenceParser
         }
         return (code, mods);
     }
+    private static IEnumerable<InputEvent> ParseTilde(string paramPart)
+    {
+        if (!int.TryParse(paramPart, out var code)) yield break;
+        KeyCode kc = code switch
+        {
+            1 => KeyCode.Home,
+            4 => KeyCode.End,
+            5 => KeyCode.PageUp,
+            6 => KeyCode.PageDown,
+            3 => KeyCode.Delete,
+            11 => KeyCode.F1,
+            12 => KeyCode.F2,
+            13 => KeyCode.F3,
+            14 => KeyCode.F4,
+            15 => KeyCode.F5,
+            17 => KeyCode.F6,
+            18 => KeyCode.F7,
+            19 => KeyCode.F8,
+            20 => KeyCode.F9,
+            21 => KeyCode.F10,
+            23 => KeyCode.F11,
+            24 => KeyCode.F12,
+            _ => KeyCode.Unknown
+        };
+        yield return InputEvent.FromKey(new KeyEvent(kc, null, KeyModifiers.None));
+    }
+
+    private static IEnumerable<InputEvent> ParseMouse(string paramPart, char final)
+    {
+        if (!paramPart.StartsWith("<")) yield break;
+        var body = paramPart.Substring(1);
+        var parts = body.Split(';');
+        if (parts.Length < 3) yield break;
+        if (!int.TryParse(parts[0], out var b) || !int.TryParse(parts[1], out var x) || !int.TryParse(parts[2], out var y)) yield break;
+        var kind = final == 'M' ? MouseEventKind.ButtonDown : MouseEventKind.ButtonUp;
+        MouseButton btn = b switch
+        {
+            0 => MouseButton.Left,
+            1 => MouseButton.Middle,
+            2 => MouseButton.Right,
+            _ => MouseButton.None
+        };
+        if (b >= 64 && b <= 65) kind = b == 64 ? MouseEventKind.ScrollUp : MouseEventKind.ScrollDown;
+        yield return InputEvent.FromMouse(new MouseEvent(x - 1, y - 1, kind, btn, KeyModifiers.None));
+    }
+
 }
