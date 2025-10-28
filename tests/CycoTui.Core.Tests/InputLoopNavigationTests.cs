@@ -14,7 +14,7 @@ public class InputLoopNavigationTests
         public void OnFocusLost() { }
     }
 
-    [Fact(Skip="Disabled due to blocking loop hang until input refactor completes")]
+    [Fact]
     public void TabCyclesFocus()
     {
         var fm = new FocusManager();
@@ -29,12 +29,15 @@ public class InputLoopNavigationTests
             InputEvent.FromKey(new KeyEvent(KeyCode.Tab, null, KeyModifiers.None)),
             InputEvent.FromKey(new KeyEvent(KeyCode.Tab, null, KeyModifiers.Shift))
         };
-        var source = new TestInputSource(events);
-        var loop = new InputLoop(source);
+        var source = new ScriptedBlockingSource(events);
+        var loop = new BlockingInputLoop(source);
         var cts = new CancellationTokenSource();
         int handled = 0;
-        loop.Run(cts.Token, e => { if (nav.Handle(e)) handled++; });
+        loop.Run(cts.Token, e => {
+            if (nav.Handle(e)) handled++;
+            if (handled == events.Length) source.Complete();
+        }, shouldStop: () => source.Completed);
         Assert.Equal(3, handled);
-        Assert.Equal(c, fm.Current); // two next, one previous => ends at c
+        Assert.Equal(b, fm.Current); // two next, one previous => ends at b
     }
 }

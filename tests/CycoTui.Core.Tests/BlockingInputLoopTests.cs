@@ -6,7 +6,7 @@ namespace CycoTui.Core.Tests;
 
 public class BlockingInputLoopTests
 {
-    [Fact(Skip="Disabled pending stable blocking source timing")]
+    [Fact]
     public void LoopProcessesAllScriptedEventsAndStopsOnCompletion()
     {
         var events = new []
@@ -20,7 +20,10 @@ public class BlockingInputLoopTests
         var loop = new BlockingInputLoop(source, resizePoller);
         int count = 0;
         var cts = new CancellationTokenSource();
-        loop.Run(cts.Token, e => count++, shouldStop: () => source.Completed);
+        loop.Run(cts.Token, e => {
+            count++;
+            if (count == events.Length) source.Complete();
+        }, shouldStop: () => source.Completed);
         Assert.Equal(3 + resizePoller.PolledCount, count); // includes any polled resize events
     }
 
