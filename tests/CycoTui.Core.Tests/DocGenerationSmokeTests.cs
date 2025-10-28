@@ -1,4 +1,6 @@
 using Xunit;
+using System.Linq;
+
 using CycoTui.Core.Documentation;
 using System.Reflection;
 using System.IO;
@@ -11,8 +13,10 @@ public class DocGenerationSmokeTests
     public void GeneratesNonEmptyMarkdown()
     {
         var asm = typeof(CycoTui.Core.Terminal.Terminal).Assembly;
-        var md = DocGenerationService.GenerateMarkdown(asm, "TEST-COMMIT");
+        var md = DocGenerationService.GenerateMarkdown(new[]{asm}, "TEST-COMMIT");
         Assert.Contains("Public Types:", md);
+        Assert.Contains("### Category Summary", md);
+        Assert.Contains("### Type Index", md);
         Assert.Contains("Namespace", md);
         // Persist portion into README.generated.md between markers
         var path = Path.Combine(Directory.GetCurrentDirectory(), "README.generated.md");
