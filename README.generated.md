@@ -1,5 +1,70 @@
 # CycoTui Core API Snapshot (Generated)
 <!-- BEGIN-AUTO-DOC -->
+Generated: 2025-10-28 00:00:00 UTC
+Commit: PENDING
+Assemblies: CycoTui.Core
+Public Types: (placeholder count)
+
+### Category Summary
+- Backend: TBD
+- Buffer: TBD
+- Input: TBD
+- Layout: TBD
+- Rendering: TBD
+- Style: TBD
+- Text: TBD
+- Widgets: TBD
+
+### Type Index
+- CycoTui.Core.Terminal.Terminal
+- CycoTui.Core.Terminal.Frame
+- CycoTui.Core.Buffer.BufferType
+- CycoTui.Core.Buffer.Cell
+- CycoTui.Core.Buffer.BufferDiff
+- CycoTui.Core.Input.InputEvent
+- CycoTui.Core.Input.KeyEvent
+- CycoTui.Core.Input.MouseEvent
+- CycoTui.Core.Input.ResizeEvent
+- CycoTui.Core.Input.FocusEvent
+(etc... placeholder)
+
+## Namespace CycoTui.Core.Terminal
+### class Terminal
+- method Draw(Action<Frame> render)
+- method Dispose()
+
+### class Frame
+- method SetCell(Int32 x, Int32 y, String grapheme, StyleType style)
+- method WriteString(Int32 x, Int32 y, String text, StyleType style)
+
+## Namespace CycoTui.Core.Buffer
+### class BufferType
+- method SetCell(Int32 x, Int32 y, Cell cell)
+- method SetString(Int32 x, Int32 y, String text, StyleType style)
+
+### struct Cell
+- field Grapheme
+- field Width
+- field Skip
+
+### class BufferDiff
+- method EnumerateSegments(BufferType previous, BufferType current)
+
+## Namespace CycoTui.Core.Input
+### struct InputEvent
+- property Type
+- property Key
+- property Mouse
+- property Resize
+- property Focus
+- method FromKey(KeyEvent e)
+- method FromMouse(MouseEvent e)
+- method FromResize(ResizeEvent e)
+- method FromFocus(FocusEvent e)
+
+<!-- END-AUTO-DOC -->
+
+<!-- BEGIN-AUTO-DOC -->
 
 # Generated Documentation (Interim)
 
