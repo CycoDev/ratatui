@@ -1,4 +1,6 @@
 # CycoTui Core API Snapshot (Generated)
+<!-- BEGIN-AUTO-DOC -->
+
 # Generated Documentation (Interim)
 
 Generated: 2025-10-27
@@ -36,3 +38,5 @@ Types: 0.00 % (0/0)  Members: 100.00 % (0/0)
 
 ## Detailed Types
 
+
+<!-- END-AUTO-DOC -->
