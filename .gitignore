@@ -4,3 +4,10 @@ target
 .gdb_history
 .idea/
 .env
+# .NET build artifacts
+bin/
+obj/
+*.dll
+*.pdb
+*.xml
+
