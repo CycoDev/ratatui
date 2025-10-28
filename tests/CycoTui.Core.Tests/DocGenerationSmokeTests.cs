@@ -1,9 +1,8 @@
 using Xunit;
-using System.Linq;
-
 using CycoTui.Core.Documentation;
 using System.Reflection;
 using System.IO;
+using System.Collections.Generic;
 
 namespace CycoTui.Core.Tests;
 
@@ -12,25 +11,58 @@ public class DocGenerationSmokeTests
     [Fact]
     public void GeneratesNonEmptyMarkdown()
     {
-        var asm = typeof(CycoTui.Core.Terminal.Terminal).Assembly;
-        var md = DocGenerationService.GenerateMarkdown(new[]{asm}, "TEST-COMMIT");
+        var assemblies = new List<Assembly> { typeof(CycoTui.Core.Terminal.Terminal).Assembly };
+        TryAddAssembly("CycoTui.Backend.Unix.UnixTerminalBackend", assemblies);
+        TryAddAssembly("CycoTui.Backend.Windows.WindowsTerminalBackend", assemblies);
+        var commit = GetGitCommitHash();
+        var md = DocGenerationService.GenerateMarkdown(assemblies, commit);
+
         Assert.Contains("Public Types:", md);
         Assert.Contains("### Category Summary", md);
         Assert.Contains("### Type Index", md);
-        Assert.Contains("Namespace", md);
-        // Persist portion into README.generated.md between markers
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "README.generated.md");
-        if (File.Exists(path))
+        Assert.Contains(commit, md);
+
+        var path = FindRepoRootReadme();
+        File.WriteAllText(path, md);
+        var persisted = File.ReadAllText(path);
+        Assert.Contains(commit, persisted);
+        Assert.Contains("### Category Summary", persisted);
+    }
+
+    private static void TryAddAssembly(string typeFullName, List<Assembly> list)
+    {
+        var t = Type.GetType(typeFullName);
+        if (t != null) list.Add(t.Assembly);
+    }
+
+    private static string GetGitCommitHash()
+    {
+        try
         {
-            var existing = File.ReadAllText(path);
-            int start = existing.IndexOf("<!-- BEGIN-AUTO-DOC -->");
-            int end = existing.IndexOf("<!-- END-AUTO-DOC -->");
-            var newBlock = md;
-            if (start >= 0 && end > start)
+            var psi = new System.Diagnostics.ProcessStartInfo
             {
-                var updated = existing.Substring(0, start) + newBlock + existing.Substring(end + "<!-- END-AUTO-DOC -->".Length);
-                File.WriteAllText(path, updated);
-            }
+                FileName = "git",
+                Arguments = "rev-parse --short HEAD",
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            };
+            using var p = System.Diagnostics.Process.Start(psi);
+            return p!.StandardOutput.ReadToEnd().Trim();
         }
+        catch { return "UNKNOWN"; }
+    }
+
+    private static string FindRepoRootReadme()
+    {
+        var dir = Directory.GetCurrentDirectory();
+        for (int i = 0; i < 10; i++)
+        {
+            var candidate = Path.Combine(dir, "README.generated.md");
+            if (File.Exists(candidate)) return candidate;
+            var parent = Directory.GetParent(dir);
+            if (parent == null) break;
+            dir = parent.FullName;
+        }
+        return Path.Combine(Directory.GetCurrentDirectory(), "README.generated.md");
     }
 }
