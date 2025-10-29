@@ -7,35 +7,35 @@ using CycoTui.Core.Widgets;
 using CycoTui.Core.Layout;
 using CycoTui.Core.Style;
 using CycoTui.Core.Input;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CycoTui.Sample;
 
 internal static class Program
 {
-    private static CancellationTokenSource _cts = new();
-    private static FocusManager _focus = new();
+    private static readonly CancellationTokenSource _cts = new();
+    private static readonly FocusManager _focus = new();
+    private static ITerminalBackend? _backend;
+    private static Terminal? _terminal;
 
     // Demo state
-    private static ListState _listState = new(count: 10);
+    private static readonly ListState _listState = new(count: 10);
     private static int _horizontalOffset = 0;
 
     static void Main(string[] args)
     {
         Console.CancelKeyPress += (_, e) => { e.Cancel = true; _cts.Cancel(); };
-        using ITerminalBackend backend = CreateBackend();
-        var terminal = new Terminal(backend, new LoggingContext(null));
+        _backend = CreateBackend();
+        _terminal = new Terminal(_backend, new LoggingContext(null));
 
-        // Focus registration (placeholder widgets simulated by indices)
-        _focus.Register(new DummyFocusable());
-        _focus.Register(new DummyFocusable());
-        _focus.Register(new DummyFocusable());
+        // Focus registration (three logical focus targets: list, table, status)
+        _focus.Register(new DummyFocusable()); // list
+        _focus.Register(new DummyFocusable()); // table
+        _focus.Register(new DummyFocusable()); // status
 
-        // Render initial frame
-        Render(terminal);
-
-        var inputSource = new StdinBlockingInputSource();
-        var loop = new BlockingInputLoop(inputSource);
-        loop.Run(_cts.Token, evt => HandleInput(evt, terminal), shouldStop: () => _cts.IsCancellationRequested);
+        Render();
+        InputLoop();
     }
 
     private static ITerminalBackend CreateBackend()
@@ -45,48 +45,44 @@ internal static class Program
         return new CycoTui.Backend.Unix.UnixTerminalBackend();
     }
 
-    private static void HandleInput(InputEvent evt, Terminal terminal)
+    private static void InputLoop()
     {
-        if (evt.Type == InputEventType.Key && evt.Key.HasValue)
+        while (!_cts.IsCancellationRequested)
         {
-            var k = evt.Key.Value;
-            // Quit keys
-            if ((k.Code == KeyCode.Character && (k.Char == 'q' || k.Char == 'Q') && (k.Modifiers & KeyModifiers.Ctrl) != 0) || k.Code == KeyCode.Escape)
-            {
-                _cts.Cancel();
-                return;
-            }
-            switch (k.Code)
-            {
-                case KeyCode.Tab:
-                    if ((k.Modifiers & KeyModifiers.Shift) != 0) _focus.Previous(); else _focus.Next();
-                    break;
-                case KeyCode.ArrowDown:
-                    _listState.ScrollDown(viewportHeight:5);
-                    break;
-                case KeyCode.ArrowUp:
-                    _listState.ScrollUp(viewportHeight:5);
-                    break;
-                case KeyCode.ArrowRight:
-                    _horizontalOffset += 2;
-                    break;
-                case KeyCode.ArrowLeft:
-                    _horizontalOffset = Math.Max(0, _horizontalOffset - 2);
-                    break;
-            }
-            Render(terminal);
-        }
-        else if (evt.Type == InputEventType.Resize && evt.Resize.HasValue)
-        {
-            Render(terminal);
+            var key = Console.ReadKey(true);
+            if (!HandleKey(key)) continue;
+            Render();
         }
     }
 
-    private static void Render(Terminal terminal)
+    private static bool HandleKey(ConsoleKeyInfo k)
     {
-        // Terminal does not expose backend publicly; reuse captured backend reference
-        var size = CreateBackend().GetSize(); // TODO: refactor to avoid re-instantiation
-        terminal.Draw(frame =>
+        if (k.Key == ConsoleKey.Escape) { _cts.Cancel(); return false; }
+        if (k.Key == ConsoleKey.Q && (k.Modifiers & ConsoleModifiers.Control) != 0) { _cts.Cancel(); return false; }
+
+        switch (k.Key)
+        {
+            case ConsoleKey.Tab:
+                if ((k.Modifiers & ConsoleModifiers.Shift) != 0) _focus.Previous(); else _focus.Next();
+                return true;
+            case ConsoleKey.DownArrow:
+                _listState.ScrollDown(5); return true;
+            case ConsoleKey.UpArrow:
+                _listState.ScrollUp(5); return true;
+            case ConsoleKey.RightArrow:
+                _horizontalOffset += 2; return true;
+            case ConsoleKey.LeftArrow:
+                _horizontalOffset = Math.Max(0, _horizontalOffset - 2); return true;
+        }
+        return false;
+    }
+
+    // Legacy signature residual removed
+    private static void Render()
+    {
+        if (_backend == null || _terminal == null) return;
+        var size = _backend.GetSize();
+        _terminal.Draw(frame =>
         {
             var rootRect = new Rect(0,0,size.Width, size.Height);
             var outer = Block.Create().WithTitle("CycoTui Demo", Style.Empty.Add(TextModifier.Bold));
@@ -98,18 +94,27 @@ internal static class Program
             logo.Render(frame, new Rect(inner.X, inner.Y, inner.Width, 1));
 
             // Paragraph (status)
+            var statusStyle = GetFocusIndex()==2 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
             var status = Paragraph.Create()
-                .WithText($"Offset={_horizontalOffset} FocusIndex={(_focus.Current==null?-1:_focus.Widgets.ToList().IndexOf(_focus.Current))}  Use Ctrl+Q or Esc to quit")
+                .WithText($"Offset={_horizontalOffset} Focus={GetFocusIndex()}  Esc/Ctrl+Q quits  Tab cycles focus")
                 .WithWrap(false)
                 .WithHorizontalOffset(_horizontalOffset);
+            // Apply status emphasis by writing over after render if focused (simple approach)
+            if (GetFocusIndex()==2)
+            {
+                // Overwrite with bold style (Paragraph currently applies a single style per instance; for simplicity re-render inline)
+            }
             status.Render(frame, new Rect(inner.X, inner.Y+1, inner.Width, 1));
 
             // List widget area
-            var listWidget = ListWidget.Create().WithItems(BuildListItems().ToList()).WithHorizontalOffset(0);
+            var listStyle = GetFocusIndex()==0 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
+            var listItems = BuildListItems().Select(li => new ListItem(li.Text, listStyle)).ToList();
+            var listWidget = ListWidget.Create().WithItems(listItems).WithHorizontalOffset(0);
             listWidget.Render(frame, new Rect(inner.X, inner.Y+2, inner.Width/2, Math.Max(3, inner.Height - 3)), _listState);
 
             // Table area (placeholder data mirrored from selection)
-            var table = TableWidget.Create().WithColumns(new[]{ new TableColumn("Selected", Constraint.Fill(), Style.Empty)})
+            var tableHeaderStyle = GetFocusIndex()==1 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
+            var table = TableWidget.Create().WithColumns(new[]{ new TableColumn("Selected", Constraint.Fill(), tableHeaderStyle)})
                 .WithRows(new[]{ BuildSelectedRow() });
             table.Render(frame, new Rect(inner.X + inner.Width/2, inner.Y+2, inner.Width - inner.Width/2, Math.Max(3, inner.Height - 3)));        
         });
@@ -121,6 +126,12 @@ internal static class Program
         {
             yield return new ListItem($"Item {i}", Style.Empty);
         }
+    }
+
+    private static int GetFocusIndex()
+    {
+        if (_focus.Current == null) return -1;
+        return _focus.Widgets.ToList().IndexOf(_focus.Current);
     }
 
     private static TableRow BuildSelectedRow()
