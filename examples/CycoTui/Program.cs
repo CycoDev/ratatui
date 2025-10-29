@@ -140,6 +140,10 @@ internal static class Program
         var selected = _listState.Selected ?? 0;
         return new TableRow(new[]{ ($"You selected {selected}", Style.Empty) });
     }
+    private static void MoveSelection(int amount)
+    {
+        _listState.Select(Math.Max(0, Math.Min(_listState.Selected ?? 0 + amount, _listState.Count -1)), _listViewportHeight);
+    }
 
     private sealed class DummyFocusable : IFocusableWidget
     {
