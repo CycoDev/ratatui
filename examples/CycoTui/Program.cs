@@ -22,6 +22,7 @@ internal static class Program
     // Demo state
     private static readonly ListState _listState = new(count: 10);
     private static int _horizontalOffset = 0;
+    private static int _listViewportHeight = 5;
 
     static void Main(string[] args)
     {
@@ -66,9 +67,9 @@ internal static class Program
                 if ((k.Modifiers & ConsoleModifiers.Shift) != 0) _focus.Previous(); else _focus.Next();
                 return true;
             case ConsoleKey.DownArrow:
-                _listState.ScrollDown(5); return true;
+                MoveSelection(1); return true;
             case ConsoleKey.UpArrow:
-                _listState.ScrollUp(5); return true;
+                MoveSelection(-1); return true;
             case ConsoleKey.RightArrow:
                 _horizontalOffset += 2; return true;
             case ConsoleKey.LeftArrow:
