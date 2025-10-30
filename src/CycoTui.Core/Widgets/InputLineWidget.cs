@@ -13,7 +13,7 @@ public sealed class InputLineWidget : IWidget
     public int CaretIndex { get; init; } = 0; // logical position after last inserted character
     public StyleType TextStyle { get; init; } = StyleType.Empty;
     public StyleType CaretStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
-    public string CaretGrapheme { get; init; } = "▌"; // visible caret block
+    public string CaretGrapheme { get; init; } = " "; // Space with inverted style shows as full block
 
     public static InputLineWidget Create() => new();
 

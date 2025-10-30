@@ -14,7 +14,7 @@ public sealed class MultiLineInputWidget : IWidget
     public IReadOnlyList<string> Lines { get; init; } = new List<string>();
     public StyleType TextStyle { get; init; } = StyleType.Empty;
     public StyleType CaretStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
-    public string CaretGrapheme { get; init; } = "▌";
+    public string CaretGrapheme { get; init; } = " "; // Space with inverted style shows as full block
     public int CaretLineIndex { get; init; } = 0; // last line index containing caret
     public int CaretColumn { get; init; } = 0;    // column after the last character
 
@@ -61,18 +61,53 @@ public sealed class MultiLineInputWidget : IWidget
         {
             string line = Lines[i];
             if (line.Length > width) line = line.Substring(0, width);
-            frame.WriteString(area.X, area.Y + i, line.PadRight(width), TextStyle);
+
+            // If this is the caret line, insert the caret into the text
+            if (i == CaretLineIndex && CaretColumn < width)
+            {
+                // Split line at caret position
+                string beforeCaret = line.Substring(0, System.Math.Min(CaretColumn, line.Length));
+                string afterCaret = CaretColumn < line.Length ? line.Substring(CaretColumn) : "";
+
+                // Write: text + caret + remaining text + padding
+                int x = area.X;
+
+                // Write text before caret
+                if (beforeCaret.Length > 0)
+                {
+                    frame.WriteString(x, area.Y + i, beforeCaret, TextStyle);
+                    x += beforeCaret.Length;
+                }
+
+                // Write caret
+                var caretCell = new CycoTui.Core.Buffer.Cell(CaretGrapheme, CaretStyle);
+                frame.Buffer.SetCell(x, area.Y + i, caretCell);
+                x += 1;
+
+                // Write text after caret
+                if (afterCaret.Length > 0 && x < area.X + width)
+                {
+                    int remaining = area.X + width - x;
+                    if (afterCaret.Length > remaining) afterCaret = afterCaret.Substring(0, remaining);
+                    frame.WriteString(x, area.Y + i, afterCaret, TextStyle);
+                    x += afterCaret.Length;
+                }
+
+                // Pad the rest with spaces
+                if (x < area.X + width)
+                {
+                    frame.WriteString(x, area.Y + i, new string(' ', area.X + width - x), TextStyle);
+                }
+            }
+            else
+            {
+                // Normal line without caret - just pad to width
+                string paddedLine = line.PadRight(width);
+                frame.WriteString(area.X, area.Y + i, paddedLine, TextStyle);
+            }
         }
         // Clear remaining lines if any
         for (int i = linesToRender; i < maxLines; i++)
             frame.WriteString(area.X, area.Y + i, new string(' ', width), TextStyle);
-
-        // Caret rendering if within visible region
-        if (CaretLineIndex < linesToRender)
-        {
-            int caretX = area.X + (CaretColumn < width ? CaretColumn : width - 1);
-            int caretY = area.Y + CaretLineIndex;
-            frame.SetCell(caretX, caretY, CaretGrapheme, CaretStyle);
-        }
     }
 }

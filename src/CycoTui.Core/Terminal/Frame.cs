@@ -31,10 +31,11 @@ public sealed class Frame
     }
 
     /// <summary>
-    /// Set a single grapheme at (x,y). Caller must ensure area bounds.
+    /// Set a single grapheme at (x,y) by using SetString (which handles width calculation).
     /// </summary>
     public void SetCell(int x, int y, string grapheme, StyleType style)
     {
-        Buffer.SetCell(x, y, new Cell(grapheme, style));
+        // Use SetString to handle grapheme width calculation properly
+        Buffer.SetString(x, y, grapheme, style);
     }
 }

@@ -7,7 +7,6 @@ using CycoTui.Core.Logging;
 using CycoTui.Core.Style;
 using CycoTui.Core.Layout;
 using CycoTui.Core.Terminal;
-using CycoTui.Core.Drawing;
 
 namespace CycoTui.Sample;
 
@@ -26,9 +25,19 @@ internal static class Program
     {
         Console.CancelKeyPress += (_, e) => { e.Cancel = true; _cts.Cancel(); };
         _backend = CreateBackend();
+        _backend.Clear();
+        _backend.HideCursor();
         _terminal = new Terminal(_backend, new LoggingContext(null));
-        Render();
-        InputLoop();
+        try
+        {
+            Render();
+            InputLoop();
+        }
+        finally
+        {
+            _terminal?.Dispose();
+            _backend?.Dispose();
+        }
     }
 
     private static ITerminalBackend CreateBackend()
@@ -120,7 +129,6 @@ internal static class Program
             // Use MultiLineInputWidget for input area with caret on last line
             new CycoTui.Core.Widgets.MultiLineInputWidget()
                 .WithLines(_inputLines)
-                .WithCaret(_inputLines.Count - 1, _inputLines[^1].Length)
                 .WithStyles(Style.Empty, Style.Empty.Add(TextModifier.Invert))
                 .Render(frame, new Rect(0, sepAboveInputY + 1, width, inputHeight));
 

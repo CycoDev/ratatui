@@ -23,8 +23,6 @@ public sealed class Terminal : IDisposable
     private BufferType _current;
     private bool _disposed;
     private bool _styleTransitionOccurred;
-    private string? _lastStyleSequence;
-    private string? _prevEmittedStyleSequence;
     // Style state tracker nested type
     private sealed class StyleState
     {
@@ -94,38 +92,38 @@ public sealed class Terminal : IDisposable
 
         // Style tracking
         var styleState = new StyleState(_backend.Capabilities);
-        var cellUpdates = new List<CellUpdate>();
 
         foreach (var seg in segments)
         {
-            EmitSegment(seg, styleState, cellUpdates);
-            FlushStyleBatch();
+            EmitSegment(seg, styleState);
         }
 
-        _backend.Draw(cellUpdates);
         _backend.Flush();
         EmitReset(styleState);
-        logger.LogInformation("[Terminal] Emitted {cells} cells", cellUpdates.Count(c => c.X >= 0));
+        logger.LogInformation("[Terminal] Emitted segment cells");
         SwapBuffers();
     }
 
-    private void EmitSegment(DiffSegment seg, StyleState styleState, List<CellUpdate> cellUpdates)
+    private void EmitSegment(DiffSegment seg, StyleState styleState)
     {
-        // TODO: Style batching not yet implemented. Placeholder for future batching buffer.
-
+        // Emit each cell immediately with its style - no batching
         for (int i = 0; i < seg.Length; i++)
         {
             var cell = seg.Cells[i];
             if (cell.Skip) continue;
+
+            // Emit style transition if needed
             var emittedStyleSeq = styleState.Apply(cell.Style);
             if (!string.IsNullOrEmpty(emittedStyleSeq))
             {
                 _styleTransitionOccurred = true;
-                // Batch: only store latest sequence; emission deferred until segment boundary.
-                _lastStyleSequence = emittedStyleSeq;
+                var compressed = CompressStyleSequence(emittedStyleSeq);
+                _backend.WriteRaw(compressed);
             }
-            // Emit cell symbol (full grapheme)
-            cellUpdates.Add(new CellUpdate(seg.StartX + i, seg.Y, new CellData(cell.Grapheme)));
+
+            // Emit cell immediately after style
+            var cellUpdate = new CellUpdate(seg.StartX + i, seg.Y, new CellData(cell.Grapheme));
+            _backend.Draw(new[] { cellUpdate });
         }
     }
 
@@ -143,21 +141,6 @@ public sealed class Terminal : IDisposable
         _previous = _current;
         _current = tmp;
         _current.Clear(); // in-place reuse
-    }
-
-    private void FlushStyleBatch()
-    {
-        if (!string.IsNullOrEmpty(_lastStyleSequence))
-        {
-            // Deduplicate identical consecutive style sequences
-            if (_lastStyleSequence != _prevEmittedStyleSequence)
-            {
-                var compressed = CompressStyleSequence(_lastStyleSequence);
-                _backend.WriteRaw(compressed);
-                _prevEmittedStyleSequence = _lastStyleSequence;
-            }
-            _lastStyleSequence = null;
-        }
     }
 
     /// <summary>Dispose backend and release resources. Safe to call multiple times.</summary>
