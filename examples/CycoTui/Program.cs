@@ -5,7 +5,9 @@ using System.Threading;
 using CycoTui.Core.Backend;
 using CycoTui.Core.Logging;
 using CycoTui.Core.Style;
+using CycoTui.Core.Layout;
 using CycoTui.Core.Terminal;
+using CycoTui.Core.Drawing;
 
 namespace CycoTui.Sample;
 
