@@ -68,9 +68,9 @@ internal static class Program
                 if ((k.Modifiers & ConsoleModifiers.Shift) != 0) _focus.Previous(); else _focus.Next();
                 return true;
             case ConsoleKey.DownArrow:
-                MoveSelection(1); return true;
+                if (GetFocusIndex()==0) { MoveSelection(1); return true; } return false;
             case ConsoleKey.UpArrow:
-                MoveSelection(-1); return true;
+                if (GetFocusIndex()==0) { MoveSelection(-1); return true; } return false;
             case ConsoleKey.RightArrow:
                 _horizontalOffset += 2; return true;
             case ConsoleKey.LeftArrow:
@@ -98,7 +98,7 @@ internal static class Program
             // Paragraph (status)
             var statusStyle = GetFocusIndex()==2 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
             var status = Paragraph.Create()
-                .WithText($"Offset={_horizontalOffset} Focus={GetFocusIndex()}  Esc/Ctrl+Q quits  Tab cycles focus")
+                .WithText($"Offset={_horizontalOffset} Focus={GetFocusIndex()} (Tab to cycle)  Esc/Ctrl+Q quits")
                 .WithWrap(false)
                 .WithHorizontalOffset(_horizontalOffset);
             // Apply status emphasis by writing over after render if focused (simple approach)
