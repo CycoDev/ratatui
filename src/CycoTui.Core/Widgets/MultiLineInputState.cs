@@ -1,0 +1,218 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace CycoTui.Core.Widgets;
+
+/// <summary>
+/// State for MultiLineInputWidget - handles text content, cursor position, and keyboard input.
+/// </summary>
+public class MultiLineInputState
+{
+    private List<string> _lines = new() { string.Empty };
+    private int _cursorColumn = 0;
+
+    /// <summary>
+    /// The current input lines.
+    /// </summary>
+    public IReadOnlyList<string> Lines => _lines;
+
+    /// <summary>
+    /// The current cursor column position within the last line.
+    /// </summary>
+    public int CursorColumn => _cursorColumn;
+
+    /// <summary>
+    /// Event raised when the user submits input (presses Enter).
+    /// </summary>
+    public event Action<string>? OnSubmit;
+
+    /// <summary>
+    /// Handles a keyboard input. Returns true if the key was handled.
+    /// </summary>
+    public bool HandleKey(ConsoleKeyInfo key)
+    {
+        int last = _lines.Count - 1;
+        string currentLine = _lines[last];
+
+        // Arrow key navigation
+        if (key.Key == ConsoleKey.LeftArrow)
+        {
+            if ((key.Modifiers & ConsoleModifiers.Alt) != 0)
+            {
+                // Alt+Left (Option/Win key): move to previous word boundary
+                _cursorColumn = FindPreviousWordBoundary(currentLine, _cursorColumn);
+            }
+            else
+            {
+                // Left: move one character left
+                if (_cursorColumn > 0) _cursorColumn--;
+            }
+            return true;
+        }
+        if (key.Key == ConsoleKey.RightArrow)
+        {
+            if ((key.Modifiers & ConsoleModifiers.Alt) != 0)
+            {
+                // Alt+Right (Option/Win key): move to next word boundary
+                _cursorColumn = FindNextWordBoundary(currentLine, _cursorColumn);
+            }
+            else
+            {
+                // Right: move one character right
+                if (_cursorColumn < currentLine.Length) _cursorColumn++;
+            }
+            return true;
+        }
+
+        // Emacs-style word navigation (Alt+B/F - used by macOS Terminal)
+        if (key.Key == ConsoleKey.B && (key.Modifiers & ConsoleModifiers.Alt) != 0)
+        {
+            _cursorColumn = FindPreviousWordBoundary(currentLine, _cursorColumn);
+            return true;
+        }
+        if (key.Key == ConsoleKey.F && (key.Modifiers & ConsoleModifiers.Alt) != 0)
+        {
+            _cursorColumn = FindNextWordBoundary(currentLine, _cursorColumn);
+            return true;
+        }
+
+        // Emacs-style line navigation
+        if (key.Key == ConsoleKey.A && (key.Modifiers & ConsoleModifiers.Control) != 0)
+        {
+            _cursorColumn = 0;
+            return true;
+        }
+        if (key.Key == ConsoleKey.E && (key.Modifiers & ConsoleModifiers.Control) != 0)
+        {
+            _cursorColumn = currentLine.Length;
+            return true;
+        }
+        if (key.Key == ConsoleKey.Home)
+        {
+            _cursorColumn = 0;
+            return true;
+        }
+        if (key.Key == ConsoleKey.End)
+        {
+            _cursorColumn = currentLine.Length;
+            return true;
+        }
+
+        // Enter: submit input
+        if (key.Key == ConsoleKey.Enter)
+        {
+            SubmitInput();
+            return true;
+        }
+
+        // Ctrl+J: new line
+        if (key.Key == ConsoleKey.J && (key.Modifiers & ConsoleModifiers.Control) != 0)
+        {
+            _lines.Add(string.Empty);
+            _cursorColumn = 0;
+            return true;
+        }
+
+        // Backspace
+        if (key.Key == ConsoleKey.Backspace)
+        {
+            if (_cursorColumn > 0)
+            {
+                // Delete character before cursor
+                _lines[last] = currentLine.Remove(_cursorColumn - 1, 1);
+                _cursorColumn--;
+            }
+            else if (_lines.Count > 1)
+            {
+                // At start of line, merge with previous line
+                _lines.RemoveAt(last);
+                _cursorColumn = _lines[last - 1].Length;
+            }
+            return true;
+        }
+
+        // Delete
+        if (key.Key == ConsoleKey.Delete)
+        {
+            if (_cursorColumn < currentLine.Length)
+            {
+                // Delete character at cursor
+                _lines[last] = currentLine.Remove(_cursorColumn, 1);
+            }
+            return true;
+        }
+
+        // Regular character input
+        if (!char.IsControl(key.KeyChar))
+        {
+            // Insert character at cursor position
+            _lines[last] = currentLine.Insert(_cursorColumn, key.KeyChar.ToString());
+            _cursorColumn++;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Clears the input and resets to initial state.
+    /// </summary>
+    public void Clear()
+    {
+        _lines = new List<string> { string.Empty };
+        _cursorColumn = 0;
+    }
+
+    /// <summary>
+    /// Gets the current input as a single string with newlines.
+    /// </summary>
+    public string GetText()
+    {
+        return string.Join("\n", _lines);
+    }
+
+    private void SubmitInput()
+    {
+        if (_lines.Count == 0) return;
+        var combined = string.Join("\n", _lines).TrimEnd();
+        if (combined.Length > 0)
+        {
+            OnSubmit?.Invoke(combined);
+        }
+        Clear();
+    }
+
+    private static int FindPreviousWordBoundary(string text, int position)
+    {
+        if (position <= 0) return 0;
+
+        // Skip whitespace backwards
+        int pos = position - 1;
+        while (pos > 0 && char.IsWhiteSpace(text[pos]))
+            pos--;
+
+        // Skip word characters backwards
+        while (pos > 0 && !char.IsWhiteSpace(text[pos - 1]))
+            pos--;
+
+        return pos;
+    }
+
+    private static int FindNextWordBoundary(string text, int position)
+    {
+        if (position >= text.Length) return text.Length;
+
+        int pos = position;
+
+        // Skip current word
+        while (pos < text.Length && !char.IsWhiteSpace(text[pos]))
+            pos++;
+
+        // Skip whitespace
+        while (pos < text.Length && char.IsWhiteSpace(text[pos]))
+            pos++;
+
+        return pos;
+    }
+}

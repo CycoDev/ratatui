@@ -8,8 +8,9 @@ namespace CycoTui.Core.Widgets;
 /// <summary>
 /// Renders multiple input lines and a visible caret after the last character of the last line.
 /// Ensures that inserting a space immediately advances the caret visually.
+/// Can be used as either an immutable widget (IWidget) or with external state (IStatefulWidget).
 /// </summary>
-public sealed class MultiLineInputWidget : IWidget
+public sealed class MultiLineInputWidget : IWidget, IStatefulWidget<MultiLineInputState>
 {
     public IReadOnlyList<string> Lines { get; init; } = new List<string>();
     public StyleType TextStyle { get; init; } = StyleType.Empty;
@@ -67,7 +68,10 @@ public sealed class MultiLineInputWidget : IWidget
             {
                 // Split line at caret position
                 string beforeCaret = line.Substring(0, System.Math.Min(CaretColumn, line.Length));
-                string afterCaret = CaretColumn < line.Length ? line.Substring(CaretColumn) : "";
+                string afterCaret = CaretColumn < line.Length ? line.Substring(CaretColumn + 1) : "";
+
+                // Character at cursor position (or space if at end)
+                string caretChar = CaretColumn < line.Length ? line[CaretColumn].ToString() : CaretGrapheme;
 
                 // Write: text + caret + remaining text + padding
                 int x = area.X;
@@ -79,8 +83,8 @@ public sealed class MultiLineInputWidget : IWidget
                     x += beforeCaret.Length;
                 }
 
-                // Write caret
-                var caretCell = new CycoTui.Core.Buffer.Cell(CaretGrapheme, CaretStyle);
+                // Write caret (character at cursor position with inverted style)
+                var caretCell = new CycoTui.Core.Buffer.Cell(caretChar, CaretStyle);
                 frame.Buffer.SetCell(x, area.Y + i, caretCell);
                 x += 1;
 
@@ -109,5 +113,23 @@ public sealed class MultiLineInputWidget : IWidget
         // Clear remaining lines if any
         for (int i = linesToRender; i < maxLines; i++)
             frame.WriteString(area.X, area.Y + i, new string(' ', width), TextStyle);
+    }
+
+    /// <summary>
+    /// Renders the widget using external state (stateful pattern).
+    /// </summary>
+    public void Render(Frame frame, Rect area, MultiLineInputState state)
+    {
+        // Create a temporary instance with the state's data and render it
+        var widget = new MultiLineInputWidget
+        {
+            Lines = state.Lines,
+            TextStyle = TextStyle,
+            CaretStyle = CaretStyle,
+            CaretGrapheme = CaretGrapheme,
+            CaretLineIndex = state.Lines.Count - 1,
+            CaretColumn = state.CursorColumn
+        };
+        widget.Render(frame, area);
     }
 }
