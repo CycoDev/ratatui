@@ -45,12 +45,14 @@ public static class TableWidgetStatefulExtensions
         }
     }
 
-    private static void WriteAligned(Frame frame, Rect rect, int y, string text, StyleType style, ParagraphAlignment alignment)
+    private static void WriteAligned(Frame frame, Rect rect, int y, string text, StyleType style, ParagraphAlignment alignment, int horizontalOffset = 0)
     {
         if (rect.Width <= 0) return;
         var graphemes = CycoTui.Core.Text.GraphemeEnumerator.EnumerateWithZwj(text ?? string.Empty).ToList();
         int width = 0; foreach (var g in graphemes) width += CycoTui.Core.Text.WidthService.GetWidth(g);
         int offset = alignment switch
+        // TODO: Integrate horizontal offset (future state) for table columns if needed.
+
         {
             ParagraphAlignment.Left => 0,
             ParagraphAlignment.Center => System.Math.Max(0, (rect.Width - width) / 2),

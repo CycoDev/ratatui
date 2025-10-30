@@ -98,9 +98,15 @@
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/zh-Hant/Microsoft.TestPlatform.CommunicationUtilities.resources.dll
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/zh-Hant/Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/zh-Hant/Microsoft.VisualStudio.TestPlatform.Common.resources.dll
+/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Backend.Unix.dll
+/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Backend.Windows.dll
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Core.dll
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Core.pdb
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Core.xml
+/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Backend.Unix.pdb
+/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Backend.Unix.xml
+/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Backend.Windows.pdb
+/Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/bin/Debug/net9.0/CycoTui.Backend.Windows.xml
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/obj/Debug/net9.0/CycoTui..ACC6140D.Up2Date
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/obj/Debug/net9.0/CycoTui.Core.Tests.dll
 /Users/phs/cycoai/github/cycodev/ratatui/tests/CycoTui.Core.Tests/obj/Debug/net9.0/refint/CycoTui.Core.Tests.dll

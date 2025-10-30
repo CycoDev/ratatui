@@ -109,25 +109,25 @@ internal static class Program
             {
                 string line = i < visibleMessages.Count ? visibleMessages[i] : string.Empty;
                 if (line.Length > width) line = line[..width];
-                frame.WriteString(0, i, line.PadRight(width), StyleType.Empty);
+                frame.WriteString(0, i, line.PadRight(width), Style.Empty);
             }
 
             int sepAboveInputY = contentHeight;
-            frame.WriteString(0, sepAboveInputY, new string('─', width), StyleType.Empty.Add(TextModifier.Dim));
+            frame.WriteString(0, sepAboveInputY, new string('─', width), Style.Empty.Add(TextModifier.Dim));
 
-            for (int i = 0; i < inputHeight; i++)
-            {
-                string inputLine = _inputLines[i];
-                if (inputLine.Length > width) inputLine = inputLine[..width];
-                frame.WriteString(0, sepAboveInputY + 1 + i, inputLine.PadRight(width), StyleType.Empty);
-            }
+            // Use MultiLineInputWidget for input area with caret on last line
+            new CycoTui.Core.Widgets.MultiLineInputWidget()
+                .WithLines(_inputLines)
+                .WithCaret(_inputLines.Count - 1, _inputLines[^1].Length)
+                .WithStyles(Style.Empty, Style.Empty.Add(TextModifier.Invert))
+                .Render(frame, new Rect(0, sepAboveInputY + 1, width, inputHeight));
 
             int sepBelowInputY = sepAboveInputY + 1 + inputHeight;
-            frame.WriteString(0, sepBelowInputY, new string('─', width), StyleType.Empty.Add(TextModifier.Dim));
+            frame.WriteString(0, sepBelowInputY, new string('─', width), Style.Empty.Add(TextModifier.Dim));
 
             string status = $"Messages: {_messages.Count}  Lines: {_inputLines.Count}  Enter=Submit  Ctrl+J=NewLine  Esc/Ctrl+Q=Quit";
             if (status.Length > width) status = status[..width];
-            frame.WriteString(0, sepBelowInputY + 1, status.PadRight(width), StyleType.Empty.Add(TextModifier.Bold));
+            frame.WriteString(0, sepBelowInputY + 1, status.PadRight(width), Style.Empty.Add(TextModifier.Bold));
         });
     }
 }

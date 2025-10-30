@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Unix / ANSI backend implementation for CycoTui.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8cbd87ef0b9db98b48124d799d91b59f5988b30b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66b798573aa5f78d0990e1d20d8df2502e8e490a")]
 [assembly: System.Reflection.AssemblyProductAttribute("CycoTui.Backend.Unix")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CycoTui.Backend.Unix")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

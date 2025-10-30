@@ -1,9 +1,3 @@
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.csproj.AssemblyReference.cache
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.GeneratedMSBuildEditorConfig.editorconfig
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.AssemblyInfoInputs.cache
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.AssemblyInfo.cs
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.csproj.CoreCompileInputs.cache
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.sourcelink.json
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/bin/Debug/net9.0/CycoTui.Backend.Windows.deps.json
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/bin/Debug/net9.0/CycoTui.Backend.Windows.dll
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/bin/Debug/net9.0/CycoTui.Backend.Windows.pdb
@@ -11,6 +5,12 @@
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/bin/Debug/net9.0/CycoTui.Core.dll
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/bin/Debug/net9.0/CycoTui.Core.pdb
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/bin/Debug/net9.0/CycoTui.Core.xml
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.csproj.AssemblyReference.cache
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.GeneratedMSBuildEditorConfig.editorconfig
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.AssemblyInfoInputs.cache
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.AssemblyInfo.cs
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.csproj.CoreCompileInputs.cache
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.sourcelink.json
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui..37CE9ABC.Up2Date
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/CycoTui.Backend.Windows.dll
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Backend.Windows/obj/Debug/net9.0/refint/CycoTui.Backend.Windows.dll

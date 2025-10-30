@@ -1,13 +1,13 @@
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.deps.json
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.dll
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.pdb
+/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.xml
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.csproj.AssemblyReference.cache
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.GeneratedMSBuildEditorConfig.editorconfig
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.AssemblyInfoInputs.cache
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.AssemblyInfo.cs
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.csproj.CoreCompileInputs.cache
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.sourcelink.json
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.deps.json
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.dll
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.pdb
-/Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/bin/Debug/net9.0/CycoTui.Core.xml
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.dll
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/refint/CycoTui.Core.dll
 /Users/phs/cycoai/github/cycodev/ratatui/src/CycoTui.Core/obj/Debug/net9.0/CycoTui.Core.pdb

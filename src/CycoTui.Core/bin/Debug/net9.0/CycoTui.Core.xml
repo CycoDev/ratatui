@@ -265,6 +265,72 @@
             Runtime feature flag snapshot. Build-time exclusion still relies on conditional compilation.
             </summary>
         </member>
+        <member name="T:CycoTui.Core.Input.BlockingInputLoop">
+            <summary>
+            Blocking input loop consuming a primary blocking source plus optional polling sources.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.EscapeSequenceParser">
+            <summary>
+            Parses common ANSI escape sequences into KeyEvents (arrow keys, function keys, modifiers).
+            Simplified: does not cover full xterm protocol.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.FocusManager">
+            <summary>
+            Manages focus traversal among focusable widgets.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.IBlockingInputSource">
+            <summary>
+            Blocking input source: returns true when an event is produced; false only on cancellation.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.IInputSource">
+            <summary>
+            Abstract source of raw input events (keyboard, mouse, resize).
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.InputLoop">
+            <summary>
+            Synchronous input loop dispatching events to a handler.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.IPollingInputSource">
+            <summary>
+            Non-blocking poll source for auxiliary events (resize, timers, etc.).
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.KeyBindingService">
+            <summary>
+            Simple key binding service mapping KeyEvents to handlers.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.KeyNavigationHandler">
+            <summary>
+            Provides basic Tab/Shift+Tab navigation for a FocusManager.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.ResizePollingSource">
+            <summary>
+            Simple polling input source that emits ResizeEvent when terminal size changes.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.ScriptedBlockingSource">
+            <summary>
+            Blocking scripted source for tests. Dequeues events; waits when empty until completion signaled.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.StdinBlockingInputSource">
+            <summary>
+            Blocking stdin source using Console.ReadKey. Simplified; escape sequences read naïvely.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Input.TestInputSource">
+            <summary>
+            Scripted input source for unit tests.
+            </summary>
+        </member>
         <member name="T:CycoTui.Core.Layout.AlignmentMode">
             <summary>
             Alignment/distribution mode controlling placement and spacing of segments within available free space.
@@ -358,7 +424,7 @@
             <summary>
             Computes difference between two modifier sets.
             Phase-1: simple added/removed calculation.
-            TODO (IMPLEMENTATION-DECISIONS-001 #5): add Bold/Dim intensity normalization logic and minimal ANSI sequence emission ordering.
+            Intensity (Bold/Dim) normalization: if either Bold or Dim changes, reset both then apply new set to avoid conflicting states.
             </summary>
         </member>
         <member name="T:CycoTui.Core.Style.StyleEmitter">
@@ -437,6 +503,11 @@
             are merged into a single grapheme string.
             </summary>
         </member>
+        <member name="T:CycoTui.Core.Text.HorizontalTextScroller">
+            <summary>
+            Provides helpers for horizontally scrolling (windowing) grapheme sequences.
+            </summary>
+        </member>
         <member name="T:CycoTui.Core.Text.MaskedText">
             <summary>
             Represents text whose visual representation is masked but original content retained.
@@ -486,6 +557,24 @@
             Horizontal progress bar (gauge) widget showing completion ratio with configurable characters and styles.
             </summary>
         </member>
+        <member name="T:CycoTui.Core.Widgets.HorizontalScrollState">
+            <summary>
+            Tracks horizontal scrolling position for a viewport. Immutable except for Offset mutation methods.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.IContainerWidget">
+            <summary>
+            Contract for a widget that defines an inner content region within a provided outer area.
+            </summary>
+        </member>
+        <member name="M:CycoTui.Core.Widgets.IContainerWidget.GetContentArea(CycoTui.Core.Layout.Rect)">
+            <summary>Compute the inner content area given the outer area allocated to the container.</summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.InputLineWidget">
+            <summary>
+            Renders a single line of text with a visible caret. The caret ensures cursor movement is visible even when inserting spaces.
+            </summary>
+        </member>
         <member name="T:CycoTui.Core.Widgets.IStatefulWidget`1">
             <summary>
             Stateful widget interface allowing a render with external state object.
@@ -512,9 +601,9 @@
             State for ListWidget including selected index and vertical scroll offset.
             </summary>
         </member>
-        <member name="T:CycoTui.Core.Widgets.ListWidget">
+        <member name="T:CycoTui.Core.Widgets.LogoWidget">
             <summary>
-            Vertical list widget supporting selection highlighting, optional item wrapping, and scrolling via ListState.
+            Simple branding / header widget for CycoTui demonstrations.
             </summary>
         </member>
         <member name="T:CycoTui.Core.Widgets.Paragraph">
@@ -565,6 +654,11 @@
         <member name="T:CycoTui.Core.Widgets.TabsWidget">
             <summary>
             Tabs widget rendering a horizontal set of labels with alignment and selected tab styling.
+            </summary>
+        </member>
+        <member name="T:CycoTui.Core.Widgets.WidgetComposer">
+            <summary>
+            Helper utilities for composing container widgets with nested render actions.
             </summary>
         </member>
     </members>

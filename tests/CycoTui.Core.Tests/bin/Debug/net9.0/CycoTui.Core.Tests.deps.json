@@ -8,6 +8,8 @@
     ".NETCoreApp,Version=v9.0": {
       "CycoTui.Core.Tests/1.0.0": {
         "dependencies": {
+          "CycoTui.Backend.Unix": "1.0.0",
+          "CycoTui.Backend.Windows": "1.0.0",
           "CycoTui.Core": "1.0.0",
           "Microsoft.Extensions.Logging": "9.0.10",
           "Microsoft.NET.Test.Sdk": "17.9.0",
@@ -405,6 +407,30 @@
         }
       },
       "xunit.runner.visualstudio/2.5.6": {},
+      "CycoTui.Backend.Unix/1.0.0": {
+        "dependencies": {
+          "CycoTui.Core": "1.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.10"
+        },
+        "runtime": {
+          "CycoTui.Backend.Unix.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "CycoTui.Backend.Windows/1.0.0": {
+        "dependencies": {
+          "CycoTui.Core": "1.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.10"
+        },
+        "runtime": {
+          "CycoTui.Backend.Windows.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "CycoTui.Core/1.0.0": {
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "9.0.10"
@@ -570,6 +596,16 @@
       "sha512": "sha512-CW6uhMXNaQQNMSG1IWhHkBT+V5eqHqn7MP0zfNMhU9wS/sgKX7FGL3rzoaUgt26wkY3bpf7pDVw3IjXhwfiP4w==",
       "path": "xunit.runner.visualstudio/2.5.6",
       "hashPath": "xunit.runner.visualstudio.2.5.6.nupkg.sha512"
+    },
+    "CycoTui.Backend.Unix/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CycoTui.Backend.Windows/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "CycoTui.Core/1.0.0": {
       "type": "project",

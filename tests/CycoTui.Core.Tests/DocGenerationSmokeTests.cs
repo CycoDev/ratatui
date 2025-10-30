@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using CycoTui.Core.Documentation;
 using System.Reflection;

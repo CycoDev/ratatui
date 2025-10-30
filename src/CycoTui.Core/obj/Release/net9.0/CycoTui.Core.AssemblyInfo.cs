@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Core primitives for CycoTui: geometry, styling, buffer, backend abstractions.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8cbd87ef0b9db98b48124d799d91b59f5988b30b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4350a462b105e6a8a17548ddbfbf3830ee7c4969")]
 [assembly: System.Reflection.AssemblyProductAttribute("CycoTui.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CycoTui.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
