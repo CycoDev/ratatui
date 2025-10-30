@@ -21,6 +21,7 @@ internal static class Program
 
     // Demo state
     private static readonly ListState _listState = new(count: 10);
+    private static int _selectedIndex = 0;
     private static int _horizontalOffset = 0;
     private static int _listViewportHeight = 5;
 
@@ -34,7 +35,8 @@ internal static class Program
         _focus.Register(new DummyFocusable()); // list
         _focus.Register(new DummyFocusable()); // table
         _focus.Register(new DummyFocusable()); // status
-        _listState.Select(0, _listViewportHeight);
+        _selectedIndex = 0;
+        _listState.Select(_selectedIndex, _listViewportHeight);
 
         Render();
         InputLoop();
@@ -109,7 +111,7 @@ internal static class Program
             status.Render(frame, new Rect(inner.X, inner.Y+1, inner.Width, 1));
 
             // List widget area
-            var selectedIndex = _listState.Selected ?? 0;
+            var selectedIndex = _selectedIndex;
             bool listFocused = GetFocusIndex()==0;
             var listItems = Enumerable.Range(0,10).Select(i =>
                 new ListItem(((i==selectedIndex)?"> ":"  ")+ $"Item {i}",
@@ -146,9 +148,12 @@ internal static class Program
         var selected = _listState.Selected ?? 0;
         return new TableRow(new[]{ ($"You selected {selected}", Style.Empty) });
     }
-    private static void MoveSelection(int amount)
+    private static void MoveSelection(int delta)
     {
-        _listState.Select(Math.Max(0, Math.Min(_listState.Selected ?? 0 + amount, _listState.Count -1)), _listViewportHeight);
+        _selectedIndex += delta;
+        if (_selectedIndex < 0) _selectedIndex = 0;
+        if (_selectedIndex > 9) _selectedIndex = 9; // TODO: derive from list length
+        _listState.Select(_selectedIndex, _listViewportHeight);
     }
 
     private sealed class DummyFocusable : IFocusableWidget
