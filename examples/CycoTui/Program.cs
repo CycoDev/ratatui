@@ -34,6 +34,7 @@ internal static class Program
         _focus.Register(new DummyFocusable()); // list
         _focus.Register(new DummyFocusable()); // table
         _focus.Register(new DummyFocusable()); // status
+        _listState.Select(0, _listViewportHeight);
 
         Render();
         InputLoop();
@@ -111,9 +112,9 @@ internal static class Program
             var selectedIndex = _listState.Selected ?? 0;
             bool listFocused = GetFocusIndex()==0;
             var listItems = Enumerable.Range(0,10).Select(i =>
-                new ListItem($"Item {i}",
-                    i==selectedIndex
-                      ? (listFocused ? Style.Empty.Add(TextModifier.Bold) : Style.Empty.Add(TextModifier.Italic))
+                new ListItem(((i==selectedIndex)?"> ":"  ")+ $"Item {i}",
+                    i==selectedIndex && listFocused
+                      ? Style.Empty.Add(TextModifier.Bold)
                       : Style.Empty)).ToList();
             var listWidget = ListWidget.Create().WithItems(listItems).WithHorizontalOffset(0);
             listWidget.Render(frame, new Rect(inner.X, inner.Y+2, inner.Width/2, Math.Max(3, inner.Height - 3)), _listState);
