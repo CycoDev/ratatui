@@ -1,51 +1,36 @@
 using System;
-using System.Threading;
-using CycoTui.Core.Terminal;
-using CycoTui.Core.Backend;
-using CycoTui.Core.Logging;
-using CycoTui.Core.Widgets;
-using CycoTui.Core.Layout;
-using CycoTui.Core.Style;
-using CycoTui.Core.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using CycoTui.Core.Backend;
+using CycoTui.Core.Logging;
+using CycoTui.Core.Style;
+using CycoTui.Core.Terminal;
 
 namespace CycoTui.Sample;
 
 internal static class Program
 {
     private static readonly CancellationTokenSource _cts = new();
-    private static readonly FocusManager _focus = new();
     private static ITerminalBackend? _backend;
     private static Terminal? _terminal;
 
-    // Demo state
-    private static readonly ListState _listState = new(count: 10);
-    private static int _selectedIndex = 0;
-    private static int _previousSelectedIndex = 0;
-    private static int _horizontalOffset = 0;
-    private static int _listViewportHeight = 5;
+    // Content history (top area)
+    private static readonly List<string> _messages = new();
+    // Current input lines (expandable)
+    private static List<string> _inputLines = new() { string.Empty };
 
     static void Main(string[] args)
     {
         Console.CancelKeyPress += (_, e) => { e.Cancel = true; _cts.Cancel(); };
         _backend = CreateBackend();
         _terminal = new Terminal(_backend, new LoggingContext(null));
-
-        // Focus registration (three logical focus targets: list, table, status)
-        _focus.Register(new DummyFocusable()); // list
-        _focus.Register(new DummyFocusable()); // table
-        _focus.Register(new DummyFocusable()); // status
-        _selectedIndex = 0;
-        _listState.Select(_selectedIndex, _listViewportHeight);
-
         Render();
         InputLoop();
     }
 
     private static ITerminalBackend CreateBackend()
     {
-        // Simple preference: use Unix backend on Unix, Windows backend on Windows else minimal.
         if (OperatingSystem.IsWindows()) return new CycoTui.Backend.Windows.WindowsTerminalBackend();
         return new CycoTui.Backend.Unix.UnixTerminalBackend();
     }
@@ -54,7 +39,7 @@ internal static class Program
     {
         while (!_cts.IsCancellationRequested)
         {
-            var key = Console.ReadKey(true);
+            var key = Console.ReadKey(intercept: true);
             if (!HandleKey(key)) continue;
             Render();
         }
@@ -65,102 +50,84 @@ internal static class Program
         if (k.Key == ConsoleKey.Escape) { _cts.Cancel(); return false; }
         if (k.Key == ConsoleKey.Q && (k.Modifiers & ConsoleModifiers.Control) != 0) { _cts.Cancel(); return false; }
 
-        switch (k.Key)
+        if (k.Key == ConsoleKey.Enter)
         {
-            case ConsoleKey.Tab:
-                if ((k.Modifiers & ConsoleModifiers.Shift) != 0) _focus.Previous(); else _focus.Next();
-                return true;
-            case ConsoleKey.DownArrow:
-                if (GetFocusIndex()==0) { MoveSelection(1); return true; } return false;
-            case ConsoleKey.UpArrow:
-                if (GetFocusIndex()==0) { MoveSelection(-1); return true; } return false;
-            case ConsoleKey.RightArrow:
-                _horizontalOffset += 2; return true;
-            case ConsoleKey.LeftArrow:
-                _horizontalOffset = Math.Max(0, _horizontalOffset - 2); return true;
+            SubmitInput();
+            return true;
+        }
+        if (k.Key == ConsoleKey.J && (k.Modifiers & ConsoleModifiers.Control) != 0)
+        {
+            _inputLines.Add(string.Empty);
+            return true;
+        }
+        if (k.Key == ConsoleKey.Backspace)
+        {
+            if (_inputLines.Count > 0)
+            {
+                int last = _inputLines.Count - 1;
+                if (_inputLines[last].Length > 0)
+                    _inputLines[last] = _inputLines[last][..^1];
+                else if (_inputLines.Count > 1)
+                    _inputLines.RemoveAt(last);
+            }
+            return true;
+        }
+        if (!char.IsControl(k.KeyChar))
+        {
+            int last = _inputLines.Count - 1;
+            _inputLines[last] += k.KeyChar;
+            return true;
         }
         return false;
     }
 
-    // Legacy signature residual removed
+    private static void SubmitInput()
+    {
+        if (_inputLines.Count == 0) return;
+        var combined = string.Join("\n", _inputLines).TrimEnd();
+        if (combined.Length > 0) _messages.Add(combined);
+        _inputLines = new List<string> { string.Empty };
+    }
+
     private static void Render()
     {
         if (_backend == null || _terminal == null) return;
         var size = _backend.GetSize();
         _terminal.Draw(frame =>
         {
-            var rootRect = new Rect(0,0,size.Width, size.Height);
-            var outer = Block.Create().WithTitle("CycoTui Demo", Style.Empty.Add(TextModifier.Bold));
-            outer.Render(frame, rootRect);
-            var inner = Block.GetInnerContentRect(rootRect, Padding.Zero);
+            int width = size.Width;
+            int height = size.Height;
+            int statusLineHeight = 1;
+            int inputHeight = Math.Max(1, _inputLines.Count);
+            int separators = 2; // lines above and below input
+            int reserved = inputHeight + separators + statusLineHeight;
+            int contentHeight = Math.Max(0, height - reserved);
 
-            // Logo
-            var logo = LogoWidget.Create();
-            logo.Render(frame, new Rect(inner.X, inner.Y, inner.Width, 1));
-
-            // Paragraph (status)
-            var statusStyle = GetFocusIndex()==2 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
-            var status = Paragraph.Create()
-                .WithText($"Offset={_horizontalOffset} Focus={GetFocusIndex()} (Tab to cycle)  Esc/Ctrl+Q quits")
-                .WithWrap(false)
-                .WithHorizontalOffset(_horizontalOffset);
-            // Apply status emphasis by writing over after render if focused (simple approach)
-            if (GetFocusIndex()==2)
+            // Content area: newest at bottom, oldest truncated at top
+            var visibleMessages = _messages.TakeLast(contentHeight).ToList();
+            for (int i = 0; i < contentHeight; i++)
             {
-                // Overwrite with bold style (Paragraph currently applies a single style per instance; for simplicity re-render inline)
+                string line = i < visibleMessages.Count ? visibleMessages[i] : string.Empty;
+                if (line.Length > width) line = line[..width];
+                frame.WriteString(0, i, line.PadRight(width), StyleType.Empty);
             }
-            status.Render(frame, new Rect(inner.X, inner.Y+1, inner.Width, 1));
 
-            // Upstream ListWidget usage
-            var listItems = Enumerable.Range(0,10)
-                .Select(i => new ListItem($"Item {i}", Style.Empty))
-                .ToList();
-            var listWidget = ListWidget.Create()
-                .WithItems(listItems)
-                .WithFocused(GetFocusIndex()==0);
-            var listRect = new Rect(inner.X, inner.Y+2, inner.Width/2, Math.Max(3, inner.Height - 3));
-            listWidget.Render(frame, listRect, _listState);
+            int sepAboveInputY = contentHeight;
+            frame.WriteString(0, sepAboveInputY, new string('─', width), StyleType.Empty.Add(TextModifier.Dim));
 
-            // Table area (placeholder data mirrored from selection)
-            var tableHeaderStyle = GetFocusIndex()==1 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
-            var table = TableWidget.Create().WithColumns(new[]{ new TableColumn("Selected", Constraint.Fill(), tableHeaderStyle)})
-                .WithRows(new[]{ BuildSelectedRow() });
-            table.Render(frame, new Rect(inner.X + inner.Width/2, inner.Y+2, inner.Width - inner.Width/2, Math.Max(3, inner.Height - 3)));        
+            for (int i = 0; i < inputHeight; i++)
+            {
+                string inputLine = _inputLines[i];
+                if (inputLine.Length > width) inputLine = inputLine[..width];
+                frame.WriteString(0, sepAboveInputY + 1 + i, inputLine.PadRight(width), StyleType.Empty);
+            }
+
+            int sepBelowInputY = sepAboveInputY + 1 + inputHeight;
+            frame.WriteString(0, sepBelowInputY, new string('─', width), StyleType.Empty.Add(TextModifier.Dim));
+
+            string status = $"Messages: {_messages.Count}  Lines: {_inputLines.Count}  Enter=Submit  Ctrl+J=NewLine  Esc/Ctrl+Q=Quit";
+            if (status.Length > width) status = status[..width];
+            frame.WriteString(0, sepBelowInputY + 1, status.PadRight(width), StyleType.Empty.Add(TextModifier.Bold));
         });
-    }
-
-    private static IEnumerable<ListItem> BuildListItems()
-    {
-        for (int i=0;i<10;i++)
-        {
-            yield return new ListItem($"Item {i}", Style.Empty);
-        }
-    }
-
-    private static int GetFocusIndex()
-    {
-        if (_focus.Current == null) return -1;
-        return _focus.Widgets.ToList().IndexOf(_focus.Current);
-    }
-
-    private static TableRow BuildSelectedRow()
-    {
-        var selected = _listState.Selected ?? 0;
-        return new TableRow(new[]{ ($"You selected {selected}", Style.Empty) });
-    }
-    private static void MoveSelection(int delta)
-    {
-        _previousSelectedIndex = _selectedIndex;
-        _selectedIndex += delta;
-        if (_selectedIndex < 0) _selectedIndex = 0;
-        if (_selectedIndex > 9) _selectedIndex = 9; // TODO: derive from list length
-        _listState.Select(_selectedIndex, _listViewportHeight);
-    }
-
-    private sealed class DummyFocusable : IFocusableWidget
-    {
-        public bool CanFocus => true;
-        public void OnFocusGained() {}
-        public void OnFocusLost() {}
     }
 }
