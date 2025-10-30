@@ -22,6 +22,7 @@ internal static class Program
     // Demo state
     private static readonly ListState _listState = new(count: 10);
     private static int _selectedIndex = 0;
+    private static int _previousSelectedIndex = 0;
     private static int _horizontalOffset = 0;
     private static int _listViewportHeight = 5;
 
@@ -110,16 +111,15 @@ internal static class Program
             }
             status.Render(frame, new Rect(inner.X, inner.Y+1, inner.Width, 1));
 
-            // List widget area
-            var selectedIndex = _selectedIndex;
-            bool listFocused = GetFocusIndex()==0;
-            var listItems = Enumerable.Range(0,10).Select(i =>
-                new ListItem(((i==selectedIndex)?"> ":"  ")+ $"Item {i}",
-                    i==selectedIndex && listFocused
-                      ? Style.Empty.Add(TextModifier.Bold)
-                      : Style.Empty)).ToList();
-            var listWidget = ListWidget.Create().WithItems(listItems).WithHorizontalOffset(0);
-            listWidget.Render(frame, new Rect(inner.X, inner.Y+2, inner.Width/2, Math.Max(3, inner.Height - 3)), _listState);
+            // Upstream ListWidget usage
+            var listItems = Enumerable.Range(0,10)
+                .Select(i => new ListItem($"Item {i}", Style.Empty))
+                .ToList();
+            var listWidget = ListWidget.Create()
+                .WithItems(listItems)
+                .WithFocused(GetFocusIndex()==0);
+            var listRect = new Rect(inner.X, inner.Y+2, inner.Width/2, Math.Max(3, inner.Height - 3));
+            listWidget.Render(frame, listRect, _listState);
 
             // Table area (placeholder data mirrored from selection)
             var tableHeaderStyle = GetFocusIndex()==1 ? Style.Empty.Add(TextModifier.Bold) : Style.Empty;
@@ -150,6 +150,7 @@ internal static class Program
     }
     private static void MoveSelection(int delta)
     {
+        _previousSelectedIndex = _selectedIndex;
         _selectedIndex += delta;
         if (_selectedIndex < 0) _selectedIndex = 0;
         if (_selectedIndex > 9) _selectedIndex = 9; // TODO: derive from list length

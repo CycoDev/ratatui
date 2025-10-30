@@ -1,24 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CycoTui.Core.Layout;
 using CycoTui.Core.Style;
 using CycoTui.Core.Terminal;
-using CycoTui.Core.Text;
 
 namespace CycoTui.Core.Widgets;
 
-/// <summary>
-/// Vertical list widget supporting selection highlighting, optional item wrapping, and scrolling via ListState.
-/// </summary>
 public sealed class ListWidget : IStatefulWidget<ListState>
 {
     public IReadOnlyList<ListItem> Items { get; init; } = Array.Empty<ListItem>();
-    public StyleType SelectedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
+    public StyleType SelectedStyle { get; init; } = StyleType.Empty; // fallback when not focused
     public StyleType ItemStyle { get; init; } = StyleType.Empty;
-    public bool WrapItems { get; init; } = false; // if true, item text wraps line width
+    public bool WrapItems { get; init; } = false;
     public int HorizontalOffset { get; init; } = 0;
 
-    private ListWidget() { }
+    public bool Focused { get; init; } = false;
+    public bool ClearEachRow { get; init; } = true;
+    public bool UseSelectionPrefix { get; init; } = true;
+    public string SelectedPrefix { get; init; } = "> ";
+    public string UnselectedPrefix { get; init; } = "  ";
+    public StyleType SelectedFocusedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Bold);
+    public StyleType SelectedBlurStyle { get; init; } = StyleType.Empty;
 
     public static ListWidget Create() => new();
 
@@ -27,85 +30,96 @@ public sealed class ListWidget : IStatefulWidget<ListState>
         Items = items,
         SelectedStyle = SelectedStyle,
         ItemStyle = ItemStyle,
-        WrapItems = WrapItems
+        WrapItems = WrapItems,
+        HorizontalOffset = HorizontalOffset,
+        Focused = Focused,
+        ClearEachRow = ClearEachRow,
+        UseSelectionPrefix = UseSelectionPrefix,
+        SelectedPrefix = SelectedPrefix,
+        UnselectedPrefix = UnselectedPrefix,
+        SelectedFocusedStyle = SelectedFocusedStyle,
+        SelectedBlurStyle = SelectedBlurStyle
     };
-    public ListWidget WithHorizontalOffset(int offset) => new()
+
+    public ListWidget WithFocused(bool focused) => new()
     {
         Items = Items,
         SelectedStyle = SelectedStyle,
         ItemStyle = ItemStyle,
         WrapItems = WrapItems,
-        HorizontalOffset = offset
+        HorizontalOffset = HorizontalOffset,
+        Focused = focused,
+        ClearEachRow = ClearEachRow,
+        UseSelectionPrefix = UseSelectionPrefix,
+        SelectedPrefix = SelectedPrefix,
+        UnselectedPrefix = UnselectedPrefix,
+        SelectedFocusedStyle = SelectedFocusedStyle,
+        SelectedBlurStyle = SelectedBlurStyle
     };
 
-    public ListWidget WithSelectedStyle(StyleType style) => new()
-    {
-        Items = Items,
-        SelectedStyle = style,
-        ItemStyle = ItemStyle,
-        WrapItems = WrapItems
-    };
-
-    public ListWidget WithItemStyle(StyleType style) => new()
-    {
-        Items = Items,
-        SelectedStyle = SelectedStyle,
-        ItemStyle = style,
-        WrapItems = WrapItems
-    };
-
-    public ListWidget WithWrapItems(bool wrap) => new()
+    public ListWidget WithSelectionPrefix(string selected, string unselected) => new()
     {
         Items = Items,
         SelectedStyle = SelectedStyle,
         ItemStyle = ItemStyle,
-        WrapItems = wrap
+        WrapItems = WrapItems,
+        HorizontalOffset = HorizontalOffset,
+        Focused = Focused,
+        ClearEachRow = ClearEachRow,
+        UseSelectionPrefix = true,
+        SelectedPrefix = selected,
+        UnselectedPrefix = unselected,
+        SelectedFocusedStyle = SelectedFocusedStyle,
+        SelectedBlurStyle = SelectedBlurStyle
     };
 
-    public void Render(Frame frame, Rect area, ListState state)
+    public void Render(Frame frame, Rect rect, ListState state)
     {
-        if (area.Height <= 0 || area.Width <= 0) return;
-        int start = state.Offset;
-        int line = 0;
-        for (int i = start; i < Items.Count && line < area.Height; i++)
+        if (Items.Count == 0 || rect.Height <= 0 || rect.Width <= 0) return;
+        int offset = state.Offset;
+        int visible = Math.Min(rect.Height, Items.Count - offset);
+        for (int localRow = 0; localRow < visible; localRow++)
         {
-            var item = Items[i];
-            var style = (state.Selected.HasValue && state.Selected.Value == i) ? SelectedStyle : ItemStyle;
-            RenderItem(frame, area, line, item, style);
-            line++;
+            int itemIndex = offset + localRow;
+            bool isSelected = itemIndex == state.Selected;
+            RenderRow(frame, rect, localRow, itemIndex, isSelected);
         }
     }
 
-    private void RenderItem(Frame frame, Rect area, int lineIndex, ListItem item, StyleType style)
+    private void RenderRow(Frame frame, Rect rect, int localRow, int itemIndex, bool isSelected)
     {
-        var text = item.Text ?? string.Empty;
-        int x = area.X;
-        int y = area.Y + lineIndex;
-        if (!WrapItems)
+        int y = rect.Y + localRow;
+        int x = rect.X;
+        int rowWidth = rect.Width;
+        if (rowWidth <= 0) return;
+
+        if (ClearEachRow)
+            frame.WriteString(x, y, new string(' ', rowWidth), StyleType.Empty);
+
+        var prefix = UseSelectionPrefix ? (isSelected ? SelectedPrefix : UnselectedPrefix) : string.Empty;
+        int prefixLen = prefix.Length;
+        var baseText = itemIndex < Items.Count ? Items[itemIndex].Text : string.Empty;
+
+        var prefixStyle = isSelected
+            ? (Focused ? SelectedFocusedStyle : (SelectedStyle != StyleType.Empty ? SelectedStyle : SelectedBlurStyle))
+            : ItemStyle;
+
+        if (prefixLen > 0 && prefixLen <= rowWidth)
+            frame.WriteString(x, y, prefix, prefixStyle);
+
+        int remaining = rowWidth - prefixLen;
+        if (remaining > 0)
         {
-            var graphemes = GraphemeEnumerator.EnumerateWithZwj(text);
-            if (HorizontalOffset > 0)
+            var txt = baseText.Length > remaining ? baseText[..remaining] : baseText;
+            if (!WrapItems && HorizontalOffset > 0 && txt.Length > HorizontalOffset)
             {
-                graphemes = CycoTui.Core.Text.HorizontalTextScroller.EnumerateVisibleGraphemes(text, HorizontalOffset, area.Width);
+                var sliced = txt.Substring(Math.Min(HorizontalOffset, txt.Length - 1));
+                sliced = sliced.Length > remaining ? sliced[..remaining] : sliced;
+                frame.WriteString(x + prefixLen, y, sliced, StyleType.Empty);
             }
-            foreach (var g in graphemes)
+            else
             {
-                if (x >= area.X + area.Width) break;
-                frame.SetCell(x, y, g, style);
-                x += WidthService.GetWidth(g);
-            }
-        }
-        else
-        {
-            // Wrap logic similar to Paragraph
-            int currentWidth = 0;
-            foreach (var g in GraphemeEnumerator.EnumerateWithZwj(text))
-            {
-                int w = WidthService.GetWidth(g);
-                if (currentWidth + w > area.Width) break; // single-line wrap only for now
-                frame.SetCell(x, y, g, style);
-                x += w;
-                currentWidth += w;
+                frame.WriteString(x + prefixLen, y, txt, StyleType.Empty);
             }
         }
     }
