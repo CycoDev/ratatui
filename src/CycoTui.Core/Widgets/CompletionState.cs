@@ -11,6 +11,17 @@ namespace CycoTui.Core.Widgets;
 public delegate Task<IReadOnlyList<string>> CompletionItemsProvider();
 
 /// <summary>
+/// Represents a completion trigger configuration.
+/// </summary>
+/// <param name="TriggerChar">The character that activates this completion (e.g., '@', '#', '/')</param>
+/// <param name="Provider">The async provider for completion items</param>
+/// <param name="Label">Optional label for the completion type (e.g., "Files", "Tags", "Commands")</param>
+public readonly record struct CompletionTrigger(
+    char TriggerChar,
+    CompletionItemsProvider Provider,
+    string? Label = null);
+
+/// <summary>
 /// State for completion popup triggered by a character (e.g., '@' for files, '#' for tags).
 /// Tracks whether completion is active, the search query, matched items, and selection.
 /// </summary>
@@ -52,6 +63,16 @@ public sealed record CompletionState
     public int TriggerColumn { get; init; }
 
     /// <summary>
+    /// The trigger character that activated this completion (e.g., '@', '#', '/').
+    /// </summary>
+    public char TriggerChar { get; init; }
+
+    /// <summary>
+    /// Optional label for the completion type (e.g., "Files", "Tags", "Commands").
+    /// </summary>
+    public string? TriggerLabel { get; init; }
+
+    /// <summary>
     /// Error message if loading items failed, or null if no error.
     /// </summary>
     public string? ErrorMessage { get; init; }
@@ -69,7 +90,7 @@ public sealed record CompletionState
     /// <summary>
     /// Activates completion mode with the given items and trigger position.
     /// </summary>
-    public CompletionState Activate(IReadOnlyList<string> allItems, int lineIndex, int column)
+    public CompletionState Activate(IReadOnlyList<string> allItems, int lineIndex, int column, char triggerChar, string? triggerLabel = null)
     {
         return new CompletionState
         {
@@ -80,6 +101,8 @@ public sealed record CompletionState
             SelectedIndex = 0,
             TriggerLineIndex = lineIndex,
             TriggerColumn = column,
+            TriggerChar = triggerChar,
+            TriggerLabel = triggerLabel,
             ErrorMessage = null
         };
     }
@@ -87,7 +110,7 @@ public sealed record CompletionState
     /// <summary>
     /// Activates completion mode with an error message (e.g., when loading items fails).
     /// </summary>
-    public CompletionState ActivateWithError(string errorMessage, int lineIndex, int column)
+    public CompletionState ActivateWithError(string errorMessage, int lineIndex, int column, char triggerChar, string? triggerLabel = null)
     {
         return new CompletionState
         {
@@ -98,6 +121,8 @@ public sealed record CompletionState
             SelectedIndex = 0,
             TriggerLineIndex = lineIndex,
             TriggerColumn = column,
+            TriggerChar = triggerChar,
+            TriggerLabel = triggerLabel,
             ErrorMessage = errorMessage
         };
     }
@@ -118,7 +143,9 @@ public sealed record CompletionState
             MatchedItems = filtered,
             SelectedIndex = System.Math.Min(SelectedIndex, System.Math.Max(0, filtered.Count - 1)),
             TriggerLineIndex = TriggerLineIndex,
-            TriggerColumn = TriggerColumn
+            TriggerColumn = TriggerColumn,
+            TriggerChar = TriggerChar,
+            TriggerLabel = TriggerLabel
         };
     }
 
@@ -165,16 +192,11 @@ public sealed record CompletionState
     }
 
     /// <summary>
-    /// Filters items based on the query (case-insensitive substring match).
+    /// Filters items based on the query using fuzzy matching.
+    /// Items are sorted by relevance score.
     /// </summary>
     private static IReadOnlyList<string> FilterItems(IReadOnlyList<string> items, string query)
     {
-        if (string.IsNullOrWhiteSpace(query))
-            return items;
-
-        var lowerQuery = query.ToLowerInvariant();
-        return items
-            .Where(f => f.ToLowerInvariant().Contains(lowerQuery))
-            .ToList();
+        return FuzzyMatcher.Filter(items, query);
     }
 }

@@ -8,12 +8,26 @@ using CycoTui.Core.Terminal;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
+/// Popup position preference for completion widget.
+/// </summary>
+public enum PopupPosition
+{
+    /// <summary>Always show popup above the input area.</summary>
+    Above,
+    /// <summary>Always show popup below the input area.</summary>
+    Below,
+    /// <summary>Automatically choose position based on available space.</summary>
+    Auto
+}
+
+/// <summary>
 /// Renders a completion popup overlay with a bordered list of matching items.
-/// Designed to appear above the input area when a trigger character is pressed.
+/// Designed to appear above or below the input area when a trigger character is pressed.
 /// </summary>
 public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
 {
     public int MaxVisibleItems { get; init; } = 10;
+    public PopupPosition PreferredPosition { get; init; } = PopupPosition.Auto;
     public StyleType BorderStyle { get; init; } = StyleType.Empty;
     public StyleType TitleStyle { get; init; } = StyleType.Empty.Add(TextModifier.Bold);
     public StyleType SelectedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
@@ -24,6 +38,17 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
     public CompletionPopupWidget WithMaxVisibleItems(int max) => new()
     {
         MaxVisibleItems = max,
+        PreferredPosition = PreferredPosition,
+        BorderStyle = BorderStyle,
+        TitleStyle = TitleStyle,
+        SelectedStyle = SelectedStyle,
+        ItemStyle = ItemStyle
+    };
+
+    public CompletionPopupWidget WithPreferredPosition(PopupPosition position) => new()
+    {
+        MaxVisibleItems = MaxVisibleItems,
+        PreferredPosition = position,
         BorderStyle = BorderStyle,
         TitleStyle = TitleStyle,
         SelectedStyle = SelectedStyle,
@@ -37,6 +62,7 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
         StyleType item) => new()
     {
         MaxVisibleItems = MaxVisibleItems,
+        PreferredPosition = PreferredPosition,
         BorderStyle = border,
         TitleStyle = title,
         SelectedStyle = selected,
@@ -47,8 +73,12 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
     /// Calculates the required rectangle for the popup based on matched items.
     /// Width is determined by the longest item + border + prefix.
     /// Height is capped by MaxVisibleItems + border.
+    /// Position is determined by PreferredPosition and available terminal space.
     /// </summary>
-    public Rect CalculatePopupRect(Rect inputArea, CompletionState state)
+    /// <param name="inputArea">The input area rectangle</param>
+    /// <param name="state">The completion state</param>
+    /// <param name="terminalHeight">Total terminal height for positioning calculations</param>
+    public Rect CalculatePopupRect(Rect inputArea, CompletionState state, int terminalHeight)
     {
         if (!state.IsActive || state.MatchedItems.Count == 0)
         {
@@ -66,22 +96,65 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
         totalWidth = Math.Max(20, totalWidth);
         totalWidth = Math.Min(totalWidth, 120); // Reasonable max width
 
-        // Calculate height from number of items
+        // Calculate ideal height from number of items
         int visibleItems = Math.Min(state.MatchedItems.Count, MaxVisibleItems);
         int borderHeight = 2; // top + bottom border
-        int totalHeight = visibleItems + borderHeight;
+        int idealHeight = visibleItems + borderHeight;
 
-        // Position popup ABOVE the input area
-        int popupX = inputArea.X;
-        int popupY = inputArea.Y - totalHeight;
+        // Calculate available space above and below input
+        int spaceAbove = inputArea.Y;
+        int spaceBelow = terminalHeight - (inputArea.Y + inputArea.Height);
 
-        // Ensure popup doesn't go off-screen (clamp to Y >= 0)
-        if (popupY < 0)
+        // Determine position based on preference and available space
+        bool showAbove;
+        switch (PreferredPosition)
         {
-            popupY = 0;
-            // Recalculate height to fit available space
-            totalHeight = Math.Min(totalHeight, inputArea.Y);
+            case PopupPosition.Above:
+                showAbove = true;
+                break;
+            case PopupPosition.Below:
+                showAbove = false;
+                break;
+            case PopupPosition.Auto:
+            default:
+                // Auto: choose position with more space
+                showAbove = spaceAbove >= spaceBelow;
+                break;
         }
+
+        // Calculate final position and height
+        int popupX = inputArea.X;
+        int popupY;
+        int totalHeight;
+
+        if (showAbove)
+        {
+            // Position above input
+            totalHeight = Math.Min(idealHeight, spaceAbove);
+            popupY = inputArea.Y - totalHeight;
+
+            // Clamp to ensure Y >= 0
+            if (popupY < 0)
+            {
+                popupY = 0;
+                totalHeight = inputArea.Y;
+            }
+        }
+        else
+        {
+            // Position below input
+            popupY = inputArea.Y + inputArea.Height;
+            totalHeight = Math.Min(idealHeight, spaceBelow);
+
+            // Clamp to ensure doesn't exceed terminal height
+            if (popupY + totalHeight > terminalHeight)
+            {
+                totalHeight = Math.Max(3, terminalHeight - popupY);
+            }
+        }
+
+        // Ensure minimum height for usability
+        totalHeight = Math.Max(3, totalHeight);
 
         return new Rect(popupX, popupY, totalWidth, totalHeight);
     }
@@ -110,11 +183,23 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
         }
 
         // Create title with match count
-        string title = state.MatchedItems.Count == 0
-            ? "No matches"
-            : state.Query.Length == 0
+        string title;
+        if (state.MatchedItems.Count == 0)
+        {
+            title = "No matches";
+        }
+        else if (state.Query.Length == 0)
+        {
+            // Show label if available, otherwise just count
+            title = string.IsNullOrEmpty(state.TriggerLabel)
                 ? $"Items ({state.MatchedItems.Count})"
-                : $"@{state.Query} ({state.MatchedItems.Count})";
+                : $"{state.TriggerLabel} ({state.MatchedItems.Count})";
+        }
+        else
+        {
+            // Show trigger + query + count
+            title = $"{state.TriggerChar}{state.Query} ({state.MatchedItems.Count})";
+        }
 
         // Render border with title
         var block2 = Block.Create()

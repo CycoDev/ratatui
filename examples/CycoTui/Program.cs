@@ -21,19 +21,38 @@ internal static class Program
     private static readonly List<string> _messages = new();
     // Multi-line input state (handles input, cursor, etc.)
     private static readonly MultiLineInputState _inputState = new();
-    // File completion state (handles '@' file completion popup)
+    // Completion state (handles '@', '#', etc. completion popup)
     private static CompletionState _completionState = CompletionState.CreateInactive();
 
-    // Callback to provide completion items when '@' is pressed
-    // You can implement this however you want - filesystem, API, cache, etc.
-    private static readonly CompletionItemsProvider _completionItemsProvider = async () =>
+    // Configure multiple completion triggers
+    // Each trigger can have its own provider and label
+    private static readonly List<CompletionTrigger> _completionTriggers = new()
     {
-        // Using the WorkspaceFileScanner helper (provided by CycoTui)
-        // But you could replace this with any source of items
-        var workspaceRoot = Environment.CurrentDirectory;
+        // '@' for file completion
+        new CompletionTrigger(
+            '@',
+            async () =>
+            {
+                var workspaceRoot = Environment.CurrentDirectory;
+                return await Task.Run(() => WorkspaceFileScanner.ScanFiles(workspaceRoot, maxFiles: 1000));
+            },
+            "Files"
+        ),
 
-        // Run file scanning on a background thread to avoid blocking the UI
-        return await Task.Run(() => WorkspaceFileScanner.ScanFiles(workspaceRoot, maxFiles: 1000));
+        // '#' for tag completion (example)
+        new CompletionTrigger(
+            '#',
+            async () =>
+            {
+                await Task.CompletedTask;
+                return new List<string>
+                {
+                    "bug", "feature", "enhancement", "documentation",
+                    "refactor", "test", "performance", "security"
+                };
+            },
+            "Tags"
+        )
     };
 
     static void Main(string[] args)
@@ -114,22 +133,24 @@ internal static class Program
 
     private static bool HandleCompletionKey(ConsoleKeyInfo key)
     {
-        // Up arrow - select previous item
-        if (key.Key == ConsoleKey.UpArrow)
+        // Up arrow or Ctrl+P - select previous item
+        if (key.Key == ConsoleKey.UpArrow ||
+            (key.Key == ConsoleKey.P && (key.Modifiers & ConsoleModifiers.Control) != 0))
         {
             _completionState = _completionState.SelectPrevious();
             return true;
         }
 
-        // Down arrow - select next item
-        if (key.Key == ConsoleKey.DownArrow)
+        // Down arrow or Ctrl+N - select next item
+        if (key.Key == ConsoleKey.DownArrow ||
+            (key.Key == ConsoleKey.N && (key.Modifiers & ConsoleModifiers.Control) != 0))
         {
             _completionState = _completionState.SelectNext();
             return true;
         }
 
-        // Enter - insert selected file
-        if (key.Key == ConsoleKey.Enter)
+        // Enter or Tab - insert selected file
+        if (key.Key == ConsoleKey.Enter || key.Key == ConsoleKey.Tab)
         {
             var selectedItem = _completionState.GetSelectedItem();
             if (selectedItem != null)
@@ -151,20 +172,42 @@ internal static class Program
         var currentLine = _inputState.Lines[_inputState.CursorLineIndex];
         var cursorColumn = _inputState.CursorColumn;
 
-        // Detect if there's an active '@' completion trigger
-        var query = CompletionHelper.DetectCompletionQuery(currentLine, cursorColumn, out int triggerColumn);
+        // Collect all trigger characters
+        var triggerChars = _completionTriggers.Select(t => t.TriggerChar);
+
+        // Detect if there's an active completion trigger
+        var query = CompletionHelper.DetectCompletionQuery(
+            currentLine,
+            cursorColumn,
+            triggerChars,
+            out int triggerColumn,
+            out char foundTriggerChar);
 
         if (query != null)
         {
-            // Activate or update completion
-            if (!_completionState.IsActive)
+            // Find the matching trigger configuration
+            var trigger = _completionTriggers.FirstOrDefault(t => t.TriggerChar == foundTriggerChar);
+            if (trigger.Provider == null)
             {
-                // First time - call the provider callback to get items (with error handling)
+                // No provider configured for this trigger
+                _completionState = _completionState.Deactivate();
+                return;
+            }
+
+            // Activate or update completion
+            if (!_completionState.IsActive || _completionState.TriggerChar != foundTriggerChar)
+            {
+                // First time or different trigger - call the provider callback to get items
                 try
                 {
-                    // Note: This blocks the UI thread. Phase 3 will add proper async with loading state.
-                    var items = _completionItemsProvider().GetAwaiter().GetResult();
-                    _completionState = _completionState.Activate(items, _inputState.CursorLineIndex, triggerColumn);
+                    // Note: This blocks the UI thread briefly
+                    var items = trigger.Provider().GetAwaiter().GetResult();
+                    _completionState = _completionState.Activate(
+                        items,
+                        _inputState.CursorLineIndex,
+                        triggerColumn,
+                        foundTriggerChar,
+                        trigger.Label);
                 }
                 catch (Exception ex)
                 {
@@ -172,7 +215,9 @@ internal static class Program
                     _completionState = _completionState.ActivateWithError(
                         $"Error loading items: {ex.Message}",
                         _inputState.CursorLineIndex,
-                        triggerColumn);
+                        triggerColumn,
+                        foundTriggerChar,
+                        trigger.Label);
                 }
             }
 
@@ -195,11 +240,12 @@ internal static class Program
         var currentLine = _inputState.Lines[_inputState.CursorLineIndex];
         var cursorColumn = _inputState.CursorColumn;
 
-        // Insert the file path
+        // Insert the selected item with the appropriate trigger character
         var newLine = CompletionHelper.InsertCompletion(
             currentLine,
             _completionState.TriggerColumn,
             cursorColumn,
+            _completionState.TriggerChar,
             selectedFile,
             out int newCursorColumn);
 
@@ -253,7 +299,7 @@ internal static class Program
                         selected: Style.Empty.Add(TextModifier.Invert),
                         item: Style.Empty);
 
-                var popupRect = popupWidget.CalculatePopupRect(inputRect, _completionState);
+                var popupRect = popupWidget.CalculatePopupRect(inputRect, _completionState, height);
                 popupWidget.Render(frame, popupRect, _completionState);
             }
 
