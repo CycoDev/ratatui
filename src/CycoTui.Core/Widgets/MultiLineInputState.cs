@@ -222,6 +222,18 @@ public class MultiLineInputState
         return string.Join("\n", _lines);
     }
 
+    /// <summary>
+    /// Sets the content of a specific line and updates cursor position.
+    /// </summary>
+    public void SetLine(int lineIndex, string content, int newCursorColumn)
+    {
+        if (lineIndex < 0 || lineIndex >= _lines.Count)
+            return;
+
+        _lines[lineIndex] = content;
+        _cursorColumn = Math.Max(0, Math.Min(newCursorColumn, content.Length));
+    }
+
     private void SubmitInput()
     {
         if (_lines.Count == 0) return;

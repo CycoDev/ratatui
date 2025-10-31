@@ -21,6 +21,18 @@ internal static class Program
     private static readonly List<string> _messages = new();
     // Multi-line input state (handles input, cursor, etc.)
     private static readonly MultiLineInputState _inputState = new();
+    // File completion state (handles '@' file completion popup)
+    private static FileCompletionState _completionState = FileCompletionState.CreateInactive();
+
+    // Callback to provide completion items when '@' is pressed
+    // You can implement this however you want - filesystem, API, cache, etc.
+    private static readonly CompletionItemsProvider _completionItemsProvider = () =>
+    {
+        // Using the WorkspaceFileScanner helper (provided by CycoTui)
+        // But you could replace this with any source of items
+        var workspaceRoot = Environment.CurrentDirectory;
+        return WorkspaceFileScanner.ScanFiles(workspaceRoot, maxFiles: 1000);
+    };
 
     static void Main(string[] args)
     {
@@ -57,9 +69,15 @@ internal static class Program
         {
             var key = Console.ReadKey(intercept: true);
 
-            // Handle ESC key for quitting
+            // Handle ESC key - cancel completion or quit
             if (key.Key == ConsoleKey.Escape)
             {
+                if (_completionState.IsActive)
+                {
+                    _completionState = _completionState.Deactivate();
+                    Render();
+                    continue;
+                }
                 _cts.Cancel();
                 continue;
             }
@@ -71,12 +89,105 @@ internal static class Program
                 continue;
             }
 
+            // If completion is active, intercept navigation keys
+            if (_completionState.IsActive)
+            {
+                bool handled = HandleCompletionKey(key);
+                if (handled)
+                {
+                    Render();
+                    continue;
+                }
+            }
+
             // Let the input state handle the key
             if (_inputState.HandleKey(key))
             {
+                // After input changes, check if we should activate/update completion
+                UpdateCompletionState();
                 Render();
             }
         }
+    }
+
+    private static bool HandleCompletionKey(ConsoleKeyInfo key)
+    {
+        // Up arrow - select previous item
+        if (key.Key == ConsoleKey.UpArrow)
+        {
+            _completionState = _completionState.SelectPrevious();
+            return true;
+        }
+
+        // Down arrow - select next item
+        if (key.Key == ConsoleKey.DownArrow)
+        {
+            _completionState = _completionState.SelectNext();
+            return true;
+        }
+
+        // Enter - insert selected file
+        if (key.Key == ConsoleKey.Enter)
+        {
+            var selectedFile = _completionState.GetSelectedFile();
+            if (selectedFile != null)
+            {
+                InsertSelectedFile(selectedFile);
+                _completionState = _completionState.Deactivate();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void UpdateCompletionState()
+    {
+        // Get current line and cursor position
+        if (_inputState.Lines.Count == 0) return;
+
+        var currentLine = _inputState.Lines[_inputState.CursorLineIndex];
+        var cursorColumn = _inputState.CursorColumn;
+
+        // Detect if there's an active '@' completion trigger
+        var query = CompletionHelper.DetectCompletionQuery(currentLine, cursorColumn, out int triggerColumn);
+
+        if (query != null)
+        {
+            // Activate or update completion
+            if (!_completionState.IsActive)
+            {
+                // First time - call the provider callback to get items
+                var items = _completionItemsProvider();
+                _completionState = _completionState.Activate(items, _inputState.CursorLineIndex, triggerColumn);
+            }
+
+            // Update query
+            _completionState = _completionState.UpdateQuery(query);
+        }
+        else if (_completionState.IsActive)
+        {
+            // No longer in completion context - deactivate
+            _completionState = _completionState.Deactivate();
+        }
+    }
+
+    private static void InsertSelectedFile(string selectedFile)
+    {
+        // Get current state
+        var currentLine = _inputState.Lines[_inputState.CursorLineIndex];
+        var cursorColumn = _inputState.CursorColumn;
+
+        // Insert the file path
+        var newLine = CompletionHelper.InsertCompletion(
+            currentLine,
+            _completionState.TriggerColumn,
+            cursorColumn,
+            selectedFile,
+            out int newCursorColumn);
+
+        // Update the line in the input state
+        _inputState.SetLine(_inputState.CursorLineIndex, newLine, newCursorColumn);
     }
 
     private static void Render()
@@ -106,12 +217,28 @@ internal static class Program
             frame.WriteString(0, sepAboveInputY, new string('─', width), Style.Empty.Add(TextModifier.Dim));
 
             // Use MultiLineInputWidget with state for input area
+            var inputRect = new Rect(0, sepAboveInputY + 1, width, inputHeight);
             new CycoTui.Core.Widgets.MultiLineInputWidget()
                 .WithStyles(Style.Empty, Style.Empty.Add(TextModifier.Invert))
-                .Render(frame, new Rect(0, sepAboveInputY + 1, width, inputHeight), _inputState);
+                .Render(frame, inputRect, _inputState);
 
             int sepBelowInputY = sepAboveInputY + 1 + inputHeight;
             frame.WriteString(0, sepBelowInputY, new string('─', width), Style.Empty.Add(TextModifier.Dim));
+
+            // Render file completion popup if active (overlays content above input)
+            if (_completionState.IsActive)
+            {
+                var popupWidget = FileCompletionPopupWidget.Create()
+                    .WithMaxVisibleItems(10)
+                    .WithStyles(
+                        border: Style.Empty.WithForeground(Color.Cyan),
+                        title: Style.Empty.WithForeground(Color.Cyan).Add(TextModifier.Bold),
+                        selected: Style.Empty.Add(TextModifier.Invert),
+                        item: Style.Empty);
+
+                var popupRect = popupWidget.CalculatePopupRect(inputRect, _completionState);
+                popupWidget.Render(frame, popupRect, _completionState);
+            }
 
             // Alt/Cmd+Arrow for word navigation (detected as Alt+Arrow or Alt+B/F)
             string wordNav = OperatingSystem.IsWindows() ? "Alt+←→" : "Cmd+←→";
