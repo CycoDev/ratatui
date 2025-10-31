@@ -8,10 +8,10 @@ using CycoTui.Core.Terminal;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Renders a file completion popup overlay with a bordered list of matching files.
-/// Designed to appear above the input area when '@' is pressed.
+/// Renders a completion popup overlay with a bordered list of matching items.
+/// Designed to appear above the input area when a trigger character is pressed.
 /// </summary>
-public sealed class FileCompletionPopupWidget : IStatefulWidget<FileCompletionState>
+public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
 {
     public int MaxVisibleItems { get; init; } = 10;
     public StyleType BorderStyle { get; init; } = StyleType.Empty;
@@ -19,9 +19,9 @@ public sealed class FileCompletionPopupWidget : IStatefulWidget<FileCompletionSt
     public StyleType SelectedStyle { get; init; } = StyleType.Empty.Add(TextModifier.Invert);
     public StyleType ItemStyle { get; init; } = StyleType.Empty;
 
-    public static FileCompletionPopupWidget Create() => new();
+    public static CompletionPopupWidget Create() => new();
 
-    public FileCompletionPopupWidget WithMaxVisibleItems(int max) => new()
+    public CompletionPopupWidget WithMaxVisibleItems(int max) => new()
     {
         MaxVisibleItems = max,
         BorderStyle = BorderStyle,
@@ -30,7 +30,7 @@ public sealed class FileCompletionPopupWidget : IStatefulWidget<FileCompletionSt
         ItemStyle = ItemStyle
     };
 
-    public FileCompletionPopupWidget WithStyles(
+    public CompletionPopupWidget WithStyles(
         StyleType border,
         StyleType title,
         StyleType selected,
@@ -44,30 +44,30 @@ public sealed class FileCompletionPopupWidget : IStatefulWidget<FileCompletionSt
     };
 
     /// <summary>
-    /// Calculates the required rectangle for the popup based on matched files.
-    /// Width is determined by the longest file path + border + prefix.
+    /// Calculates the required rectangle for the popup based on matched items.
+    /// Width is determined by the longest item + border + prefix.
     /// Height is capped by MaxVisibleItems + border.
     /// </summary>
-    public Rect CalculatePopupRect(Rect inputArea, FileCompletionState state)
+    public Rect CalculatePopupRect(Rect inputArea, CompletionState state)
     {
-        if (!state.IsActive || state.MatchedFiles.Count == 0)
+        if (!state.IsActive || state.MatchedItems.Count == 0)
         {
             // Return minimal rect when nothing to show
             return new Rect(inputArea.X, inputArea.Y - 3, 20, 3);
         }
 
-        // Calculate width from longest file path
-        int longestPath = state.MatchedFiles.Max(f => f.Length);
+        // Calculate width from longest item
+        int longestItem = state.MatchedItems.Max(f => f.Length);
         int selectionPrefixWidth = 2; // "> " or "  "
         int borderWidth = 2; // left + right border
-        int totalWidth = longestPath + selectionPrefixWidth + borderWidth;
+        int totalWidth = longestItem + selectionPrefixWidth + borderWidth;
 
         // Clamp to reasonable bounds (minimum 20, maximum based on terminal width)
         totalWidth = Math.Max(20, totalWidth);
         totalWidth = Math.Min(totalWidth, 120); // Reasonable max width
 
         // Calculate height from number of items
-        int visibleItems = Math.Min(state.MatchedFiles.Count, MaxVisibleItems);
+        int visibleItems = Math.Min(state.MatchedItems.Count, MaxVisibleItems);
         int borderHeight = 2; // top + bottom border
         int totalHeight = visibleItems + borderHeight;
 
@@ -86,17 +86,17 @@ public sealed class FileCompletionPopupWidget : IStatefulWidget<FileCompletionSt
         return new Rect(popupX, popupY, totalWidth, totalHeight);
     }
 
-    public void Render(Frame frame, Rect area, FileCompletionState state)
+    public void Render(Frame frame, Rect area, CompletionState state)
     {
         if (!state.IsActive || area.Width < 4 || area.Height < 3)
             return;
 
         // Create title with match count
-        string title = state.MatchedFiles.Count == 0
+        string title = state.MatchedItems.Count == 0
             ? "No matches"
             : state.Query.Length == 0
-                ? $"Files ({state.MatchedFiles.Count})"
-                : $"Files: @{state.Query} ({state.MatchedFiles.Count})";
+                ? $"Items ({state.MatchedItems.Count})"
+                : $"@{state.Query} ({state.MatchedItems.Count})";
 
         // Render border with title
         var block = Block.Create()
@@ -111,15 +111,15 @@ public sealed class FileCompletionPopupWidget : IStatefulWidget<FileCompletionSt
             return;
 
         // No items to show
-        if (state.MatchedFiles.Count == 0)
+        if (state.MatchedItems.Count == 0)
         {
-            var noMatchText = state.Query.Length == 0 ? "Type to search..." : "No files found";
+            var noMatchText = state.Query.Length == 0 ? "Type to search..." : "No items found";
             frame.WriteString(innerArea.X, innerArea.Y, noMatchText, ItemStyle);
             return;
         }
 
-        // Create ListItems from matched files
-        var listItems = state.MatchedFiles
+        // Create ListItems from matched items
+        var listItems = state.MatchedItems
             .Select(f => new ListItem(f, ItemStyle))
             .ToList();
 

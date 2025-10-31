@@ -10,10 +10,10 @@ namespace CycoTui.Core.Widgets;
 public delegate IReadOnlyList<string> CompletionItemsProvider();
 
 /// <summary>
-/// State for file completion popup triggered by '@' character.
-/// Tracks whether completion is active, the search query, matched files, and selection.
+/// State for completion popup triggered by a character (e.g., '@' for files, '#' for tags).
+/// Tracks whether completion is active, the search query, matched items, and selection.
 /// </summary>
-public sealed record FileCompletionState
+public sealed record CompletionState
 {
     /// <summary>
     /// Whether the completion popup is currently active/visible.
@@ -21,51 +21,51 @@ public sealed record FileCompletionState
     public bool IsActive { get; init; }
 
     /// <summary>
-    /// The search query (text typed after '@').
+    /// The search query (text typed after trigger character).
     /// </summary>
     public string Query { get; init; } = string.Empty;
 
     /// <summary>
-    /// All files in the workspace (cached when '@' is first pressed).
+    /// All items available for completion (cached when trigger is first activated).
     /// </summary>
-    public IReadOnlyList<string> AllFiles { get; init; } = new List<string>();
+    public IReadOnlyList<string> AllItems { get; init; } = new List<string>();
 
     /// <summary>
-    /// Files matching the current query (filtered from AllFiles).
+    /// Items matching the current query (filtered from AllItems).
     /// </summary>
-    public IReadOnlyList<string> MatchedFiles { get; init; } = new List<string>();
+    public IReadOnlyList<string> MatchedItems { get; init; } = new List<string>();
 
     /// <summary>
-    /// Index of the currently selected/highlighted file in MatchedFiles.
+    /// Index of the currently selected/highlighted item in MatchedItems.
     /// </summary>
     public int SelectedIndex { get; init; }
 
     /// <summary>
-    /// The line index where '@' was typed (for later insertion).
+    /// The line index where trigger character was typed (for later insertion).
     /// </summary>
     public int TriggerLineIndex { get; init; }
 
     /// <summary>
-    /// The column index where '@' was typed (for later insertion).
+    /// The column index where trigger character was typed (for later insertion).
     /// </summary>
     public int TriggerColumn { get; init; }
 
     /// <summary>
     /// Creates a new inactive completion state.
     /// </summary>
-    public static FileCompletionState CreateInactive() => new();
+    public static CompletionState CreateInactive() => new();
 
     /// <summary>
-    /// Activates completion mode with the given file list and trigger position.
+    /// Activates completion mode with the given items and trigger position.
     /// </summary>
-    public FileCompletionState Activate(IReadOnlyList<string> allFiles, int lineIndex, int column)
+    public CompletionState Activate(IReadOnlyList<string> allItems, int lineIndex, int column)
     {
-        return new FileCompletionState
+        return new CompletionState
         {
             IsActive = true,
             Query = string.Empty,
-            AllFiles = allFiles,
-            MatchedFiles = allFiles, // Initially show all files
+            AllItems = allItems,
+            MatchedItems = allItems, // Initially show all items
             SelectedIndex = 0,
             TriggerLineIndex = lineIndex,
             TriggerColumn = column
@@ -73,19 +73,19 @@ public sealed record FileCompletionState
     }
 
     /// <summary>
-    /// Updates the query and re-filters matched files.
+    /// Updates the query and re-filters matched items.
     /// </summary>
-    public FileCompletionState UpdateQuery(string query)
+    public CompletionState UpdateQuery(string query)
     {
         if (!IsActive) return this;
 
-        var filtered = FilterFiles(AllFiles, query);
-        return new FileCompletionState
+        var filtered = FilterItems(AllItems, query);
+        return new CompletionState
         {
             IsActive = true,
             Query = query,
-            AllFiles = AllFiles,
-            MatchedFiles = filtered,
+            AllItems = AllItems,
+            MatchedItems = filtered,
             SelectedIndex = System.Math.Min(SelectedIndex, System.Math.Max(0, filtered.Count - 1)),
             TriggerLineIndex = TriggerLineIndex,
             TriggerColumn = TriggerColumn
@@ -95,12 +95,12 @@ public sealed record FileCompletionState
     /// <summary>
     /// Moves selection up by one (wraps to bottom).
     /// </summary>
-    public FileCompletionState SelectPrevious()
+    public CompletionState SelectPrevious()
     {
-        if (!IsActive || MatchedFiles.Count == 0) return this;
+        if (!IsActive || MatchedItems.Count == 0) return this;
 
         int newIndex = SelectedIndex - 1;
-        if (newIndex < 0) newIndex = MatchedFiles.Count - 1;
+        if (newIndex < 0) newIndex = MatchedItems.Count - 1;
 
         return this with { SelectedIndex = newIndex };
     }
@@ -108,42 +108,42 @@ public sealed record FileCompletionState
     /// <summary>
     /// Moves selection down by one (wraps to top).
     /// </summary>
-    public FileCompletionState SelectNext()
+    public CompletionState SelectNext()
     {
-        if (!IsActive || MatchedFiles.Count == 0) return this;
+        if (!IsActive || MatchedItems.Count == 0) return this;
 
-        int newIndex = (SelectedIndex + 1) % MatchedFiles.Count;
+        int newIndex = (SelectedIndex + 1) % MatchedItems.Count;
         return this with { SelectedIndex = newIndex };
     }
 
     /// <summary>
-    /// Gets the currently selected file path, or null if none.
+    /// Gets the currently selected item, or null if none.
     /// </summary>
-    public string? GetSelectedFile()
+    public string? GetSelectedItem()
     {
-        if (!IsActive || MatchedFiles.Count == 0) return null;
-        if (SelectedIndex < 0 || SelectedIndex >= MatchedFiles.Count) return null;
-        return MatchedFiles[SelectedIndex];
+        if (!IsActive || MatchedItems.Count == 0) return null;
+        if (SelectedIndex < 0 || SelectedIndex >= MatchedItems.Count) return null;
+        return MatchedItems[SelectedIndex];
     }
 
     /// <summary>
     /// Deactivates completion mode.
     /// </summary>
-    public FileCompletionState Deactivate()
+    public CompletionState Deactivate()
     {
         return CreateInactive();
     }
 
     /// <summary>
-    /// Filters files based on the query (case-insensitive substring match).
+    /// Filters items based on the query (case-insensitive substring match).
     /// </summary>
-    private static IReadOnlyList<string> FilterFiles(IReadOnlyList<string> files, string query)
+    private static IReadOnlyList<string> FilterItems(IReadOnlyList<string> items, string query)
     {
         if (string.IsNullOrWhiteSpace(query))
-            return files;
+            return items;
 
         var lowerQuery = query.ToLowerInvariant();
-        return files
+        return items
             .Where(f => f.ToLowerInvariant().Contains(lowerQuery))
             .ToList();
     }

@@ -22,7 +22,7 @@ internal static class Program
     // Multi-line input state (handles input, cursor, etc.)
     private static readonly MultiLineInputState _inputState = new();
     // File completion state (handles '@' file completion popup)
-    private static FileCompletionState _completionState = FileCompletionState.CreateInactive();
+    private static CompletionState _completionState = CompletionState.CreateInactive();
 
     // Callback to provide completion items when '@' is pressed
     // You can implement this however you want - filesystem, API, cache, etc.
@@ -129,10 +129,10 @@ internal static class Program
         // Enter - insert selected file
         if (key.Key == ConsoleKey.Enter)
         {
-            var selectedFile = _completionState.GetSelectedFile();
-            if (selectedFile != null)
+            var selectedItem = _completionState.GetSelectedItem();
+            if (selectedItem != null)
             {
-                InsertSelectedFile(selectedFile);
+                InsertSelectedFile(selectedItem);
                 _completionState = _completionState.Deactivate();
                 return true;
             }
@@ -228,7 +228,7 @@ internal static class Program
             // Render file completion popup if active (overlays content above input)
             if (_completionState.IsActive)
             {
-                var popupWidget = FileCompletionPopupWidget.Create()
+                var popupWidget = CompletionPopupWidget.Create()
                     .WithMaxVisibleItems(10)
                     .WithStyles(
                         border: Style.Empty.WithForeground(Color.Cyan),

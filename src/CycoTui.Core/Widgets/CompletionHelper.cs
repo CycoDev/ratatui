@@ -3,7 +3,7 @@ using System;
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Helper methods for detecting and managing file completion triggers.
+/// Helper methods for detecting and managing completion triggers.
 /// </summary>
 public static class CompletionHelper
 {
@@ -48,14 +48,14 @@ public static class CompletionHelper
     }
 
     /// <summary>
-    /// Replaces the completion query (from '@' to cursor) with the selected file path.
+    /// Replaces the completion query (from trigger to cursor) with the selected item.
     /// </summary>
     /// <param name="line">The current input line</param>
-    /// <param name="triggerColumn">Column where '@' appears</param>
+    /// <param name="triggerColumn">Column where trigger character appears</param>
     /// <param name="cursorColumn">Current cursor position</param>
-    /// <param name="selectedFile">The file path to insert</param>
+    /// <param name="selectedFile">The selected item to insert</param>
     /// <param name="newCursorColumn">Output: new cursor position after insertion</param>
-    /// <returns>The modified line with file path inserted</returns>
+    /// <returns>The modified line with selected item inserted</returns>
     public static string InsertCompletion(
         string line,
         int triggerColumn,
@@ -69,11 +69,11 @@ public static class CompletionHelper
             return line;
         }
 
-        // Remove from '@' to cursor (inclusive of '@')
+        // Remove from trigger to cursor (inclusive of trigger)
         string before = line.Substring(0, triggerColumn);
         string after = cursorColumn < line.Length ? line.Substring(cursorColumn) : string.Empty;
 
-        // Insert file reference with '@' prefix
+        // Insert selected item with trigger prefix
         string insertion = "@" + selectedFile;
         string newLine = before + insertion + after;
 
