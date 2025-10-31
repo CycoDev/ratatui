@@ -10,6 +10,7 @@ namespace CycoTui.Core.Widgets;
 public class MultiLineInputState
 {
     private List<string> _lines = new() { string.Empty };
+    private int _cursorLineIndex = 0;
     private int _cursorColumn = 0;
 
     /// <summary>
@@ -18,7 +19,12 @@ public class MultiLineInputState
     public IReadOnlyList<string> Lines => _lines;
 
     /// <summary>
-    /// The current cursor column position within the last line.
+    /// The current cursor line index.
+    /// </summary>
+    public int CursorLineIndex => _cursorLineIndex;
+
+    /// <summary>
+    /// The current cursor column position within the current line.
     /// </summary>
     public int CursorColumn => _cursorColumn;
 
@@ -32,8 +38,7 @@ public class MultiLineInputState
     /// </summary>
     public bool HandleKey(ConsoleKeyInfo key)
     {
-        int last = _lines.Count - 1;
-        string currentLine = _lines[last];
+        string currentLine = _lines[_cursorLineIndex];
 
         // Arrow key navigation
         if (key.Key == ConsoleKey.LeftArrow)
@@ -61,6 +66,32 @@ public class MultiLineInputState
             {
                 // Right: move one character right
                 if (_cursorColumn < currentLine.Length) _cursorColumn++;
+            }
+            return true;
+        }
+        if (key.Key == ConsoleKey.UpArrow)
+        {
+            // Up: move to previous line, keeping column position if possible
+            if (_cursorLineIndex > 0)
+            {
+                _cursorLineIndex--;
+                string newLine = _lines[_cursorLineIndex];
+                // Clamp cursor column to new line length
+                if (_cursorColumn > newLine.Length)
+                    _cursorColumn = newLine.Length;
+            }
+            return true;
+        }
+        if (key.Key == ConsoleKey.DownArrow)
+        {
+            // Down: move to next line, keeping column position if possible
+            if (_cursorLineIndex < _lines.Count - 1)
+            {
+                _cursorLineIndex++;
+                string newLine = _lines[_cursorLineIndex];
+                // Clamp cursor column to new line length
+                if (_cursorColumn > newLine.Length)
+                    _cursorColumn = newLine.Length;
             }
             return true;
         }
@@ -99,18 +130,27 @@ public class MultiLineInputState
             return true;
         }
 
+        // Ctrl+J (which arrives as Ctrl+Enter): new line (split current line at cursor position)
+        if (key.Key == ConsoleKey.Enter && (key.Modifiers & ConsoleModifiers.Control) != 0)
+        {
+            // Split the current line at cursor position
+            string beforeCursor = currentLine.Substring(0, _cursorColumn);
+            string afterCursor = currentLine.Substring(_cursorColumn);
+
+            // Update current line to keep only the part before cursor
+            _lines[_cursorLineIndex] = beforeCursor;
+
+            // Insert new line with the part after cursor
+            _cursorLineIndex++;
+            _lines.Insert(_cursorLineIndex, afterCursor);
+            _cursorColumn = 0;
+            return true;
+        }
+
         // Enter: submit input
         if (key.Key == ConsoleKey.Enter)
         {
             SubmitInput();
-            return true;
-        }
-
-        // Ctrl+J: new line
-        if (key.Key == ConsoleKey.J && (key.Modifiers & ConsoleModifiers.Control) != 0)
-        {
-            _lines.Add(string.Empty);
-            _cursorColumn = 0;
             return true;
         }
 
@@ -120,14 +160,17 @@ public class MultiLineInputState
             if (_cursorColumn > 0)
             {
                 // Delete character before cursor
-                _lines[last] = currentLine.Remove(_cursorColumn - 1, 1);
+                _lines[_cursorLineIndex] = currentLine.Remove(_cursorColumn - 1, 1);
                 _cursorColumn--;
             }
-            else if (_lines.Count > 1)
+            else if (_cursorLineIndex > 0)
             {
                 // At start of line, merge with previous line
-                _lines.RemoveAt(last);
-                _cursorColumn = _lines[last - 1].Length;
+                string remainingText = _lines[_cursorLineIndex];
+                _lines.RemoveAt(_cursorLineIndex);
+                _cursorLineIndex--;
+                _cursorColumn = _lines[_cursorLineIndex].Length;
+                _lines[_cursorLineIndex] += remainingText;
             }
             return true;
         }
@@ -138,7 +181,13 @@ public class MultiLineInputState
             if (_cursorColumn < currentLine.Length)
             {
                 // Delete character at cursor
-                _lines[last] = currentLine.Remove(_cursorColumn, 1);
+                _lines[_cursorLineIndex] = currentLine.Remove(_cursorColumn, 1);
+            }
+            else if (_cursorLineIndex < _lines.Count - 1)
+            {
+                // At end of line, merge next line with current
+                _lines[_cursorLineIndex] += _lines[_cursorLineIndex + 1];
+                _lines.RemoveAt(_cursorLineIndex + 1);
             }
             return true;
         }
@@ -147,7 +196,7 @@ public class MultiLineInputState
         if (!char.IsControl(key.KeyChar))
         {
             // Insert character at cursor position
-            _lines[last] = currentLine.Insert(_cursorColumn, key.KeyChar.ToString());
+            _lines[_cursorLineIndex] = currentLine.Insert(_cursorColumn, key.KeyChar.ToString());
             _cursorColumn++;
             return true;
         }
@@ -161,6 +210,7 @@ public class MultiLineInputState
     public void Clear()
     {
         _lines = new List<string> { string.Empty };
+        _cursorLineIndex = 0;
         _cursorColumn = 0;
     }
 

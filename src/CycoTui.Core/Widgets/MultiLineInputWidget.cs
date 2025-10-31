@@ -127,7 +127,7 @@ public sealed class MultiLineInputWidget : IWidget, IStatefulWidget<MultiLineInp
             TextStyle = TextStyle,
             CaretStyle = CaretStyle,
             CaretGrapheme = CaretGrapheme,
-            CaretLineIndex = state.Lines.Count - 1,
+            CaretLineIndex = state.CursorLineIndex,
             CaretColumn = state.CursorColumn
         };
         widget.Render(frame, area);

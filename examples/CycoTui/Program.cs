@@ -115,7 +115,7 @@ internal static class Program
 
             // Alt/Cmd+Arrow for word navigation (detected as Alt+Arrow or Alt+B/F)
             string wordNav = OperatingSystem.IsWindows() ? "Alt+←→" : "Cmd+←→";
-            string status = $"Messages: {_messages.Count}  Lines: {_inputState.Lines.Count}  ←→=Move  {wordNav}=Word  Home/End or Ctrl+A/E  Enter=Submit  Ctrl+J=NewLine  Esc/Ctrl+Q=Quit";
+            string status = $"Messages: {_messages.Count}  Line: {_inputState.CursorLineIndex + 1}/{_inputState.Lines.Count}  Col: {_inputState.CursorColumn}  ←→↑↓=Move  {wordNav}=Word  Home/End  Enter=Submit  Ctrl+J=NewLine  Esc=Quit";
             if (status.Length > width) status = status[..width];
             frame.WriteString(0, sepBelowInputY + 1, status.PadRight(width), Style.Empty.Add(TextModifier.Bold));
         });
