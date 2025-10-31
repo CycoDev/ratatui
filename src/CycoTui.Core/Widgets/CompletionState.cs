@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CycoTui.Core.Widgets;
 
 /// <summary>
-/// Delegate for providing completion items when completion is triggered.
+/// Delegate for providing completion items asynchronously when completion is triggered.
 /// </summary>
-/// <returns>List of items to show in completion popup (e.g., file paths)</returns>
-public delegate IReadOnlyList<string> CompletionItemsProvider();
+/// <returns>Task that resolves to a list of items to show in completion popup (e.g., file paths)</returns>
+public delegate Task<IReadOnlyList<string>> CompletionItemsProvider();
 
 /// <summary>
 /// State for completion popup triggered by a character (e.g., '@' for files, '#' for tags).
@@ -51,6 +52,16 @@ public sealed record CompletionState
     public int TriggerColumn { get; init; }
 
     /// <summary>
+    /// Error message if loading items failed, or null if no error.
+    /// </summary>
+    public string? ErrorMessage { get; init; }
+
+    /// <summary>
+    /// Whether the state represents an error condition.
+    /// </summary>
+    public bool IsError => !string.IsNullOrEmpty(ErrorMessage);
+
+    /// <summary>
     /// Creates a new inactive completion state.
     /// </summary>
     public static CompletionState CreateInactive() => new();
@@ -68,7 +79,26 @@ public sealed record CompletionState
             MatchedItems = allItems, // Initially show all items
             SelectedIndex = 0,
             TriggerLineIndex = lineIndex,
-            TriggerColumn = column
+            TriggerColumn = column,
+            ErrorMessage = null
+        };
+    }
+
+    /// <summary>
+    /// Activates completion mode with an error message (e.g., when loading items fails).
+    /// </summary>
+    public CompletionState ActivateWithError(string errorMessage, int lineIndex, int column)
+    {
+        return new CompletionState
+        {
+            IsActive = true,
+            Query = string.Empty,
+            AllItems = new List<string>(),
+            MatchedItems = new List<string>(),
+            SelectedIndex = 0,
+            TriggerLineIndex = lineIndex,
+            TriggerColumn = column,
+            ErrorMessage = errorMessage
         };
     }
 

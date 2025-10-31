@@ -26,12 +26,14 @@ internal static class Program
 
     // Callback to provide completion items when '@' is pressed
     // You can implement this however you want - filesystem, API, cache, etc.
-    private static readonly CompletionItemsProvider _completionItemsProvider = () =>
+    private static readonly CompletionItemsProvider _completionItemsProvider = async () =>
     {
         // Using the WorkspaceFileScanner helper (provided by CycoTui)
         // But you could replace this with any source of items
         var workspaceRoot = Environment.CurrentDirectory;
-        return WorkspaceFileScanner.ScanFiles(workspaceRoot, maxFiles: 1000);
+
+        // Run file scanning on a background thread to avoid blocking the UI
+        return await Task.Run(() => WorkspaceFileScanner.ScanFiles(workspaceRoot, maxFiles: 1000));
     };
 
     static void Main(string[] args)
@@ -157,13 +159,28 @@ internal static class Program
             // Activate or update completion
             if (!_completionState.IsActive)
             {
-                // First time - call the provider callback to get items
-                var items = _completionItemsProvider();
-                _completionState = _completionState.Activate(items, _inputState.CursorLineIndex, triggerColumn);
+                // First time - call the provider callback to get items (with error handling)
+                try
+                {
+                    // Note: This blocks the UI thread. Phase 3 will add proper async with loading state.
+                    var items = _completionItemsProvider().GetAwaiter().GetResult();
+                    _completionState = _completionState.Activate(items, _inputState.CursorLineIndex, triggerColumn);
+                }
+                catch (Exception ex)
+                {
+                    // Show error in popup instead of crashing
+                    _completionState = _completionState.ActivateWithError(
+                        $"Error loading items: {ex.Message}",
+                        _inputState.CursorLineIndex,
+                        triggerColumn);
+                }
             }
 
-            // Update query
-            _completionState = _completionState.UpdateQuery(query);
+            // Update query (only if not in error state)
+            if (!_completionState.IsError)
+            {
+                _completionState = _completionState.UpdateQuery(query);
+            }
         }
         else if (_completionState.IsActive)
         {

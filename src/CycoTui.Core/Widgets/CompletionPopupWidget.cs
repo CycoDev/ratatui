@@ -91,6 +91,24 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
         if (!state.IsActive || area.Width < 4 || area.Height < 3)
             return;
 
+        // Show error state if present
+        if (state.IsError)
+        {
+            var block = Block.Create()
+                .WithTitle("Error", TitleStyle.WithForeground(Color.Red))
+                .WithBorder(BlockBorderStyle.SingleLine, BorderStyle.WithForeground(Color.Red));
+
+            block.Render(frame, area);
+
+            var innerArea = Block.GetInnerContentRect(area, Padding.Zero);
+            if (innerArea.Width > 0 && innerArea.Height > 0)
+            {
+                var errorText = state.ErrorMessage ?? "Unknown error";
+                frame.WriteString(innerArea.X, innerArea.Y, errorText, ItemStyle.WithForeground(Color.Red));
+            }
+            return;
+        }
+
         // Create title with match count
         string title = state.MatchedItems.Count == 0
             ? "No matches"
@@ -99,22 +117,22 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
                 : $"@{state.Query} ({state.MatchedItems.Count})";
 
         // Render border with title
-        var block = Block.Create()
+        var block2 = Block.Create()
             .WithTitle(title, TitleStyle)
             .WithBorder(BlockBorderStyle.SingleLine, BorderStyle);
 
-        block.Render(frame, area);
+        block2.Render(frame, area);
 
         // Get inner area for list
-        var innerArea = Block.GetInnerContentRect(area, Padding.Zero);
-        if (innerArea.Width <= 0 || innerArea.Height <= 0)
+        var innerArea2 = Block.GetInnerContentRect(area, Padding.Zero);
+        if (innerArea2.Width <= 0 || innerArea2.Height <= 0)
             return;
 
         // No items to show
         if (state.MatchedItems.Count == 0)
         {
             var noMatchText = state.Query.Length == 0 ? "Type to search..." : "No items found";
-            frame.WriteString(innerArea.X, innerArea.Y, noMatchText, ItemStyle);
+            frame.WriteString(innerArea2.X, innerArea2.Y, noMatchText, ItemStyle);
             return;
         }
 
@@ -125,7 +143,7 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
 
         // Create ListState with current selection
         var listState = new ListState(listItems.Count);
-        listState.Select(state.SelectedIndex, innerArea.Height);
+        listState.Select(state.SelectedIndex, innerArea2.Height);
 
         // Render list widget
         var listWidget = ListWidget.Create()
@@ -145,6 +163,6 @@ public sealed class CompletionPopupWidget : IStatefulWidget<CompletionState>
             ClearEachRow = false // Block already cleared the area
         };
 
-        listWidget.Render(frame, innerArea, listState);
+        listWidget.Render(frame, innerArea2, listState);
     }
 }
